@@ -4,6 +4,7 @@ package com.esotericsoftware.reflectasm;
 import static org.objectweb.asm.Opcodes.*;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
@@ -15,8 +16,7 @@ public abstract class MethodAccess {
 	static private AccessClassLoader loader = new AccessClassLoader();
 
 	static public MethodAccess get (Class type) {
-		Method[] methods = type.getDeclaredMethods();
-
+		Method[] methods = type.getMethods();
 		String className = type.getName();
 		String accessClassName = className + "MethodAccess";
 		Class accessClass = null;
@@ -63,7 +63,7 @@ public abstract class MethodAccess {
 				for (int i = 0, n = methods.length; i < n; i++) {
 					mv.visitLabel(labels[i]);
 					if (i == 0)
-						mv.visitFrame(Opcodes.F_APPEND, 1, new Object[] {"com/esotericsoftware/reflectasm/TestObject"}, 0, null);
+						mv.visitFrame(Opcodes.F_APPEND, 1, new Object[] {classNameInternal}, 0, null);
 					else
 						mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 					mv.visitVarInsn(ALOAD, 4);
@@ -72,7 +72,6 @@ public abstract class MethodAccess {
 					buffer.append('(');
 
 					Method method = methods[i];
-					System.out.println(method);
 					Class[] paramTypes = method.getParameterTypes();
 					maxArgCount = Math.max(maxArgCount, paramTypes.length);
 					for (int paramIndex = 0; paramIndex < paramTypes.length; paramIndex++) {
@@ -193,15 +192,29 @@ public abstract class MethodAccess {
 
 	abstract public Object invoke (Object object, int methodIndex, Object... args);
 
+	/**
+	 * Invokes the first method with the specified name.
+	 */
 	public Object invoke (Object object, String methodName, Object... args) {
 		return invoke(object, getIndex(methodName), args);
 	}
 
+	/**
+	 * Returns the index of the first method with the specified name.
+	 */
 	public int getIndex (String methodName) {
 		for (int i = 0, n = methods.length; i < n; i++) {
 			Method method = methods[i];
 			if (method.getName().equals(methodName)) return i;
 		}
 		throw new IllegalArgumentException("Unable to find public method: " + methodName);
+	}
+
+	public int getIndex (String methodName, Class... parameterTypes) {
+		for (int i = 0, n = methods.length; i < n; i++) {
+			Method method = methods[i];
+			if (method.getName().equals(methodName) && Arrays.equals(parameterTypes, method.getParameterTypes())) return i;
+		}
+		throw new IllegalArgumentException("Unable to find public method: " + methodName + " " + Arrays.toString(parameterTypes));
 	}
 }

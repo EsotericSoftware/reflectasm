@@ -8,7 +8,7 @@ import com.esotericsoftware.reflectasm.FieldAccess;
 
 public class FieldAccessBenchmark extends Benchmark {
 	public FieldAccessBenchmark () throws Exception {
-		int count = 10000000;
+		int count = 1000000;
 		Object[] dontCompileMeAway = new Object[count];
 
 		FieldAccess access = FieldAccess.get(SomeClass.class);

@@ -8,7 +8,7 @@ import com.esotericsoftware.reflectasm.MethodAccess;
 
 public class MethodAccessBenchmark extends Benchmark {
 	public MethodAccessBenchmark () throws Exception {
-		int count = 1000000;
+		int count = 100000;
 		Object[] dontCompileMeAway = new Object[count];
 
 		MethodAccess access = MethodAccess.get(SomeClass.class);

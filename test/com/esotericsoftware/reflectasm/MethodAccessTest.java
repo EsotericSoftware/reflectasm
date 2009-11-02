@@ -4,10 +4,9 @@ package com.esotericsoftware.reflectasm;
 import junit.framework.TestCase;
 
 public class MethodAccessTest extends TestCase {
-	public void testIndexInvoke () {
+	public void testInvoke () {
 		MethodAccess access = MethodAccess.get(SomeClass.class);
 		SomeClass someObject = new SomeClass();
-		int index;
 		Object value;
 
 		value = access.invoke(someObject, "getName");
@@ -30,6 +29,10 @@ public class MethodAccessTest extends TestCase {
 
 		value = access.invoke(someObject, "methodWithManyArguments", 1, 2f, 3, 4.2f, null, null, null);
 		assertEquals("test", value);
+
+		int index = access.getIndex("methodWithManyArguments", int.class, float.class, Integer.class, Float.class, SomeClass.class,
+			SomeClass.class, SomeClass.class);
+		assertEquals(access.getIndex("methodWithManyArguments"), index);
 	}
 
 	static public class SomeClass {
