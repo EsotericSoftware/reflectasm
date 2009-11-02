@@ -30,9 +30,7 @@ public abstract class FieldAccess {
 			String classNameInternal = className.replace('.', '/');
 
 			ClassWriter cw = new ClassWriter(0);
-			FieldVisitor fv;
 			MethodVisitor mv;
-			AnnotationVisitor av0;
 			cw.visit(V1_6, ACC_PUBLIC + ACC_SUPER, accessClassNameInternal, null, "com/esotericsoftware/reflectasm/FieldAccess",
 				null);
 			{
