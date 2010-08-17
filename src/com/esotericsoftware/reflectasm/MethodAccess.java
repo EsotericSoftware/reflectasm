@@ -13,9 +13,8 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
 public abstract class MethodAccess {
-	static private AccessClassLoader loader = new AccessClassLoader();
-
 	static public MethodAccess get (Class type) {
+		AccessClassLoader loader = AccessClassLoader.getInstance();
 		Method[] methods = type.getMethods();
 		String className = type.getName();
 		String accessClassName = className + "MethodAccess";
