@@ -14,7 +14,7 @@ import org.objectweb.asm.Type;
 
 public abstract class MethodAccess {
 	static public MethodAccess get (Class type) {
-		AccessClassLoader loader = AccessClassLoader.getInstance();
+		AccessClassLoader loader = new AccessClassLoader(type.getClassLoader());
 		Method[] methods = type.getMethods();
 		String className = type.getName();
 		String accessClassName = className + "MethodAccess";

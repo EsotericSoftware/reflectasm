@@ -5,9 +5,7 @@ import static org.objectweb.asm.Opcodes.*;
 
 import java.lang.reflect.Field;
 
-import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -15,7 +13,7 @@ import org.objectweb.asm.Type;
 
 public abstract class FieldAccess {
 	static public FieldAccess get (Class type) {
-		AccessClassLoader loader = AccessClassLoader.getInstance();
+		AccessClassLoader loader = new AccessClassLoader(type.getClassLoader());
 		Field[] fields = type.getFields();
 		String className = type.getName();
 		String accessClassName = className + "FieldAccess";
