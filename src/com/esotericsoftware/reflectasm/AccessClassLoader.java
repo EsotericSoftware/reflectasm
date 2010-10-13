@@ -2,8 +2,6 @@
 package com.esotericsoftware.reflectasm;
 
 class AccessClassLoader extends ClassLoader {
-	static private AccessClassLoader instance;
-
 	AccessClassLoader (ClassLoader parent) {
 		super(parent);
 	}
