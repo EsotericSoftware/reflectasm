@@ -3,7 +3,10 @@ package com.esotericsoftware.reflectasm;
 
 import static org.objectweb.asm.Opcodes.*;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.objectweb.asm.ClassWriter;
@@ -15,7 +18,21 @@ import org.objectweb.asm.Type;
 public abstract class MethodAccess {
 	static public MethodAccess get (Class type) {
 		AccessClassLoader loader = new AccessClassLoader(type.getClassLoader());
-		Method[] methods = type.getMethods();
+
+		ArrayList<Method> methods = new ArrayList();
+		Class nextClass = type;
+		while (nextClass != Object.class) {
+			Method[] declaredMethods = nextClass.getDeclaredMethods();
+			for (int i = 0, n = declaredMethods.length; i < n; i++) {
+				Method method = declaredMethods[i];
+				int modifiers = method.getModifiers();
+				if (Modifier.isStatic(modifiers)) continue;
+				if (Modifier.isPrivate(modifiers)) continue;
+				methods.add(method);
+			}
+			nextClass = nextClass.getSuperclass();
+		}
+
 		String className = type.getName();
 		String accessClassName = className + "MethodAccess";
 		Class accessClass = null;
@@ -49,16 +66,16 @@ public abstract class MethodAccess {
 				mv.visitVarInsn(ASTORE, 4);
 
 				mv.visitVarInsn(ILOAD, 2);
-				Label[] labels = new Label[methods.length];
-				for (int i = 0, n = methods.length; i < n; i++)
+				Label[] labels = new Label[methods.size()];
+				for (int i = 0, n = labels.length; i < n; i++)
 					labels[i] = new Label();
 				Label defaultLabel = new Label();
-				mv.visitTableSwitchInsn(0, methods.length - 1, defaultLabel, labels);
+				mv.visitTableSwitchInsn(0, labels.length - 1, defaultLabel, labels);
 
 				int maxArgCount = 0;
 
 				StringBuilder buffer = new StringBuilder(128);
-				for (int i = 0, n = methods.length; i < n; i++) {
+				for (int i = 0, n = labels.length; i < n; i++) {
 					mv.visitLabel(labels[i]);
 					if (i == 0)
 						mv.visitFrame(Opcodes.F_APPEND, 1, new Object[] {classNameInternal}, 0, null);
@@ -69,7 +86,7 @@ public abstract class MethodAccess {
 					buffer.setLength(0);
 					buffer.append('(');
 
-					Method method = methods[i];
+					Method method = methods.get(i);
 					Class[] paramTypes = method.getParameterTypes();
 					maxArgCount = Math.max(maxArgCount, paramTypes.length);
 					for (int paramIndex = 0; paramIndex < paramTypes.length; paramIndex++) {
@@ -179,7 +196,7 @@ public abstract class MethodAccess {
 		}
 		try {
 			MethodAccess access = (MethodAccess)accessClass.newInstance();
-			access.methods = methods;
+			access.methods = methods.toArray(new Method[methods.size()]);
 			return access;
 		} catch (Exception ex) {
 			throw new RuntimeException("Error constructing method access class: " + accessClassName, ex);

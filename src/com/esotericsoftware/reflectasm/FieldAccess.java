@@ -1,9 +1,9 @@
 
 package com.esotericsoftware.reflectasm;
 
-import static org.objectweb.asm.Opcodes.*;
-
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
@@ -11,10 +11,26 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
+import static org.objectweb.asm.Opcodes.*;
+
 public abstract class FieldAccess {
 	static public FieldAccess get (Class type) {
 		AccessClassLoader loader = new AccessClassLoader(type.getClassLoader());
-		Field[] fields = type.getFields();
+
+		ArrayList<Field> fields = new ArrayList();
+		Class nextClass = type;
+		while (nextClass != Object.class) {
+			Field[] declaredFields = nextClass.getDeclaredFields();
+			for (int i = 0, n = declaredFields.length; i < n; i++) {
+				Field field = declaredFields[i];
+				int modifiers = field.getModifiers();
+				if (Modifier.isStatic(modifiers)) continue;
+				if (Modifier.isPrivate(modifiers)) continue;
+				fields.add(field);
+			}
+			nextClass = nextClass.getSuperclass();
+		}
+
 		String className = type.getName();
 		String accessClassName = className + "FieldAccess";
 		Class accessClass = null;
@@ -43,14 +59,14 @@ public abstract class FieldAccess {
 				mv.visitCode();
 				mv.visitVarInsn(ILOAD, 2);
 
-				Label[] labels = new Label[fields.length];
-				for (int i = 0, n = fields.length; i < n; i++)
+				Label[] labels = new Label[fields.size()];
+				for (int i = 0, n = labels.length; i < n; i++)
 					labels[i] = new Label();
 				Label defaultLabel = new Label();
-				mv.visitTableSwitchInsn(0, fields.length - 1, defaultLabel, labels);
+				mv.visitTableSwitchInsn(0, labels.length - 1, defaultLabel, labels);
 
-				for (int i = 0, n = fields.length; i < n; i++) {
-					Field field = fields[i];
+				for (int i = 0, n = labels.length; i < n; i++) {
+					Field field = fields.get(i);
 					Type fieldType = Type.getType(field.getType());
 
 					mv.visitLabel(labels[i]);
@@ -125,14 +141,14 @@ public abstract class FieldAccess {
 				mv.visitCode();
 				mv.visitVarInsn(ILOAD, 2);
 
-				Label[] labels = new Label[fields.length];
-				for (int i = 0, n = fields.length; i < n; i++)
+				Label[] labels = new Label[fields.size()];
+				for (int i = 0, n = labels.length; i < n; i++)
 					labels[i] = new Label();
 				Label defaultLabel = new Label();
-				mv.visitTableSwitchInsn(0, fields.length - 1, defaultLabel, labels);
+				mv.visitTableSwitchInsn(0, labels.length - 1, defaultLabel, labels);
 
-				for (int i = 0, n = fields.length; i < n; i++) {
-					Field field = fields[i];
+				for (int i = 0, n = labels.length; i < n; i++) {
+					Field field = fields.get(i);
 
 					mv.visitLabel(labels[i]);
 					mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
@@ -193,7 +209,7 @@ public abstract class FieldAccess {
 		}
 		try {
 			FieldAccess access = (FieldAccess)accessClass.newInstance();
-			access.fields = fields;
+			access.fields = fields.toArray(new Field[fields.size()]);
 			return access;
 		} catch (Exception ex) {
 			throw new RuntimeException("Error constructing field access class: " + accessClassName, ex);
