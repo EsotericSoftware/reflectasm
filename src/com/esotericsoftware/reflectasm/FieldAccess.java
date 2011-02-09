@@ -28,13 +28,12 @@ public abstract class FieldAccess {
 
 			ClassWriter cw = new ClassWriter(0);
 			MethodVisitor mv;
-			cw.visit(V1_6, ACC_PUBLIC + ACC_SUPER, accessClassNameInternal, null, "com/esotericsoftware/reflectasm/FieldAccess",
-				null);
+			cw.visit(V1_1, ACC_PUBLIC, accessClassNameInternal, null, "com/esotericsoftware/reflectasm/FieldAccess", null);
 			{
 				mv = cw.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
 				mv.visitCode();
 				mv.visitVarInsn(ALOAD, 0);
-				mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V");
+				mv.visitMethodInsn(INVOKESPECIAL, "com/esotericsoftware/reflectasm/FieldAccess", "<init>", "()V");
 				mv.visitInsn(RETURN);
 				mv.visitMaxs(1, 1);
 				mv.visitEnd();

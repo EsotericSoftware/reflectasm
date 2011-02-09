@@ -29,8 +29,7 @@ public abstract class MethodAccess {
 
 			ClassWriter cw = new ClassWriter(0);
 			MethodVisitor mv;
-			cw.visit(V1_6, ACC_PUBLIC + ACC_SUPER, accessClassNameInternal, null, "com/esotericsoftware/reflectasm/MethodAccess",
-				null);
+			cw.visit(V1_1, ACC_PUBLIC, accessClassNameInternal, null, "com/esotericsoftware/reflectasm/MethodAccess", null);
 			{
 				mv = cw.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
 				mv.visitCode();
