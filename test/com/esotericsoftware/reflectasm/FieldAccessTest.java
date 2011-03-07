@@ -37,11 +37,42 @@ public class FieldAccessTest extends TestCase {
 		assertEquals(1234, access.get(someObject, index));
 	}
 
+	public void testEmptyClass () {
+		FieldAccess access = FieldAccess.get(EmptyClass.class);
+		try {
+			access.getIndex("name");
+			fail();
+		} catch (IllegalArgumentException expected) {
+			expected.printStackTrace();
+		}
+		try {
+			access.get(new EmptyClass(), "meow");
+			fail();
+		} catch (IllegalArgumentException expected) {
+			expected.printStackTrace();
+		}
+		try {
+			access.get(new EmptyClass(), 0);
+			fail();
+		} catch (IllegalArgumentException expected) {
+			expected.printStackTrace();
+		}
+		try {
+			access.set(new EmptyClass(), "foo", "moo");
+			fail();
+		} catch (IllegalArgumentException expected) {
+			expected.printStackTrace();
+		}
+	}
+
 	static public class SomeClass {
 		public String name;
 		public int intValue;
 		protected float test1;
 		Float test2;
 		private String test3;
+	}
+
+	static public class EmptyClass {
 	}
 }

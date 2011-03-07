@@ -1,6 +1,8 @@
 
 package com.esotericsoftware.reflectasm;
 
+import com.esotericsoftware.reflectasm.FieldAccessTest.EmptyClass;
+
 import junit.framework.TestCase;
 
 public class MethodAccessTest extends TestCase {
@@ -33,6 +35,43 @@ public class MethodAccessTest extends TestCase {
 		int index = access.getIndex("methodWithManyArguments", int.class, float.class, Integer.class, Float.class, SomeClass.class,
 			SomeClass.class, SomeClass.class);
 		assertEquals(access.getIndex("methodWithManyArguments"), index);
+	}
+
+	public void testEmptyClass () {
+		MethodAccess access = MethodAccess.get(EmptyClass.class);
+		try {
+			access.getIndex("name");
+			fail();
+		} catch (IllegalArgumentException expected) {
+			expected.printStackTrace();
+		}
+		try {
+			access.getIndex("name", String.class);
+			fail();
+		} catch (IllegalArgumentException expected) {
+			expected.printStackTrace();
+		}
+		try {
+			access.invoke(new EmptyClass(), "meow", "moo");
+			fail();
+		} catch (IllegalArgumentException expected) {
+			expected.printStackTrace();
+		}
+		try {
+			access.invoke(new EmptyClass(), 0);
+			fail();
+		} catch (IllegalArgumentException expected) {
+			expected.printStackTrace();
+		}
+		try {
+			access.invoke(new EmptyClass(), 0, "moo");
+			fail();
+		} catch (IllegalArgumentException expected) {
+			expected.printStackTrace();
+		}
+	}
+
+	static public class EmptyClass {
 	}
 
 	static public class SomeClass {
