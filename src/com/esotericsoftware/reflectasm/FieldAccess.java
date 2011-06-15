@@ -241,4 +241,8 @@ public abstract class FieldAccess {
 	public Object get (Object object, String fieldName) {
 		return get(object, getIndex(fieldName));
 	}
+
+	public Field[] getFields () {
+		return fields;
+	}
 }

@@ -234,4 +234,8 @@ public abstract class MethodAccess {
 		}
 		throw new IllegalArgumentException("Unable to find public method: " + methodName + " " + Arrays.toString(parameterTypes));
 	}
+
+	public Method[] getMethods () {
+		return methods;
+	}
 }
