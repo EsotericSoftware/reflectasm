@@ -44,7 +44,7 @@ public abstract class MethodAccess {
 			String accessClassNameInternal = accessClassName.replace('.', '/');
 			String classNameInternal = className.replace('.', '/');
 
-			ClassWriter cw = new ClassWriter(0);
+			ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 			MethodVisitor mv;
 			cw.visit(V1_1, ACC_PUBLIC, accessClassNameInternal, null, "com/esotericsoftware/reflectasm/MethodAccess", null);
 			{
@@ -53,15 +53,13 @@ public abstract class MethodAccess {
 				mv.visitVarInsn(ALOAD, 0);
 				mv.visitMethodInsn(INVOKESPECIAL, "com/esotericsoftware/reflectasm/MethodAccess", "<init>", "()V");
 				mv.visitInsn(RETURN);
-				mv.visitMaxs(1, 1);
+				mv.visitMaxs(0, 0);
 				mv.visitEnd();
 			}
 			{
 				mv = cw.visitMethod(ACC_PUBLIC + ACC_VARARGS, "invoke", "(Ljava/lang/Object;I[Ljava/lang/Object;)Ljava/lang/Object;",
 					null, null);
 				mv.visitCode();
-
-				int maxArgCount = 0;
 
 				if (!methods.isEmpty()) {
 					mv.visitVarInsn(ALOAD, 1);
@@ -89,7 +87,6 @@ public abstract class MethodAccess {
 
 						Method method = methods.get(i);
 						Class[] paramTypes = method.getParameterTypes();
-						maxArgCount = Math.max(maxArgCount, paramTypes.length);
 						for (int paramIndex = 0; paramIndex < paramTypes.length; paramIndex++) {
 							mv.visitVarInsn(ALOAD, 3);
 							mv.visitIntInsn(BIPUSH, paramIndex);
@@ -189,7 +186,7 @@ public abstract class MethodAccess {
 				mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;");
 				mv.visitMethodInsn(INVOKESPECIAL, "java/lang/IllegalArgumentException", "<init>", "(Ljava/lang/String;)V");
 				mv.visitInsn(ATHROW);
-				mv.visitMaxs(Math.max(5, maxArgCount + 2), 5);
+				mv.visitMaxs(0, 0);
 				mv.visitEnd();
 			}
 			cw.visitEnd();

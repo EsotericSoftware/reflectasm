@@ -42,7 +42,7 @@ public abstract class FieldAccess {
 			String accessClassNameInternal = accessClassName.replace('.', '/');
 			String classNameInternal = className.replace('.', '/');
 
-			ClassWriter cw = new ClassWriter(0);
+			ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 			MethodVisitor mv;
 			cw.visit(V1_1, ACC_PUBLIC, accessClassNameInternal, null, "com/esotericsoftware/reflectasm/FieldAccess", null);
 			{
@@ -51,7 +51,7 @@ public abstract class FieldAccess {
 				mv.visitVarInsn(ALOAD, 0);
 				mv.visitMethodInsn(INVOKESPECIAL, "com/esotericsoftware/reflectasm/FieldAccess", "<init>", "()V");
 				mv.visitInsn(RETURN);
-				mv.visitMaxs(1, 1);
+				mv.visitMaxs(0, 0);
 				mv.visitEnd();
 			}
 			{
@@ -135,7 +135,7 @@ public abstract class FieldAccess {
 				mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;");
 				mv.visitMethodInsn(INVOKESPECIAL, "java/lang/IllegalArgumentException", "<init>", "(Ljava/lang/String;)V");
 				mv.visitInsn(ATHROW);
-				mv.visitMaxs(6, 5);
+				mv.visitMaxs(0, 0);
 				mv.visitEnd();
 			}
 			{
@@ -204,7 +204,7 @@ public abstract class FieldAccess {
 				mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;");
 				mv.visitMethodInsn(INVOKESPECIAL, "java/lang/IllegalArgumentException", "<init>", "(Ljava/lang/String;)V");
 				mv.visitInsn(ATHROW);
-				mv.visitMaxs(6, 4);
+				mv.visitMaxs(0, 0);
 				mv.visitEnd();
 			}
 			cw.visitEnd();
