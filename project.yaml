@@ -1,4 +1,4 @@
 version: 1.01
 ---
-build(project);
-oneJAR(project);
+Build.build(project);
+Build.oneJAR(project);
