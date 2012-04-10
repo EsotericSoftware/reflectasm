@@ -33,6 +33,7 @@ public abstract class FieldAccess {
 
 		String className = type.getName();
 		String accessClassName = className + "FieldAccess";
+		if (accessClassName.startsWith("java.")) accessClassName = "reflectasm." + accessClassName;
 		Class accessClass = null;
 		try {
 			accessClass = loader.loadClass(accessClassName);
@@ -44,7 +45,8 @@ public abstract class FieldAccess {
 
 			ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 			MethodVisitor mv;
-			cw.visit(V1_1, ACC_PUBLIC, accessClassNameInternal, null, "com/esotericsoftware/reflectasm/FieldAccess", null);
+			cw.visit(V1_1, ACC_PUBLIC + ACC_SUPER, accessClassNameInternal, null, "com/esotericsoftware/reflectasm/FieldAccess",
+				null);
 			{
 				mv = cw.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
 				mv.visitCode();

@@ -1,9 +1,6 @@
 
 package com.esotericsoftware.reflectasm;
 
-import static org.objectweb.asm.Opcodes.*;
-
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -14,6 +11,8 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
+
+import static org.objectweb.asm.Opcodes.*;
 
 public abstract class MethodAccess {
 	static public MethodAccess get (Class type) {
@@ -35,6 +34,7 @@ public abstract class MethodAccess {
 
 		String className = type.getName();
 		String accessClassName = className + "MethodAccess";
+		if (accessClassName.startsWith("java.")) accessClassName = "reflectasm." + accessClassName;
 		Class accessClass = null;
 		try {
 			accessClass = loader.loadClass(accessClassName);
@@ -46,7 +46,8 @@ public abstract class MethodAccess {
 
 			ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 			MethodVisitor mv;
-			cw.visit(V1_1, ACC_PUBLIC, accessClassNameInternal, null, "com/esotericsoftware/reflectasm/MethodAccess", null);
+			cw.visit(V1_1, ACC_PUBLIC + ACC_SUPER, accessClassNameInternal, null, "com/esotericsoftware/reflectasm/MethodAccess",
+				null);
 			{
 				mv = cw.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
 				mv.visitCode();
@@ -206,16 +207,12 @@ public abstract class MethodAccess {
 
 	abstract public Object invoke (Object object, int methodIndex, Object... args);
 
-	/**
-	 * Invokes the first method with the specified name.
-	 */
+	/** Invokes the first method with the specified name. */
 	public Object invoke (Object object, String methodName, Object... args) {
 		return invoke(object, getIndex(methodName), args);
 	}
 
-	/**
-	 * Returns the index of the first method with the specified name.
-	 */
+	/** Returns the index of the first method with the specified name. */
 	public int getIndex (String methodName) {
 		for (int i = 0, n = methods.length; i < n; i++) {
 			Method method = methods[i];
