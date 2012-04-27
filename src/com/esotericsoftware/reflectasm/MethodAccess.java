@@ -16,7 +16,7 @@ import static org.objectweb.asm.Opcodes.*;
 
 public abstract class MethodAccess {
 	static public MethodAccess get (Class type) {
-		AccessClassLoader loader = new AccessClassLoader(type.getClassLoader());
+		AccessClassLoader loader = AccessClassLoader.get(type);
 
 		ArrayList<Method> methods = new ArrayList();
 		Class nextClass = type;

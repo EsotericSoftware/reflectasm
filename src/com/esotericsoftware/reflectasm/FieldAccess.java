@@ -15,7 +15,7 @@ import static org.objectweb.asm.Opcodes.*;
 
 public abstract class FieldAccess {
 	static public FieldAccess get (Class type) {
-		AccessClassLoader loader = new AccessClassLoader(type.getClassLoader());
+		AccessClassLoader loader = AccessClassLoader.get(type);
 
 		ArrayList<Field> fields = new ArrayList();
 		Class nextClass = type;

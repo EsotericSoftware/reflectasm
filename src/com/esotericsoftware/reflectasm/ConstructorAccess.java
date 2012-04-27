@@ -1,6 +1,8 @@
 
 package com.esotericsoftware.reflectasm;
 
+import java.lang.reflect.Modifier;
+
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 
@@ -8,7 +10,16 @@ import static org.objectweb.asm.Opcodes.*;
 
 public abstract class ConstructorAccess<T> {
 	static public <T> ConstructorAccess<T> get (Class<T> type) {
-		AccessClassLoader loader = new AccessClassLoader(type.getClassLoader());
+		try {
+			type.getConstructor((Class[])null);
+		} catch (Exception ex) {
+			if (type.isMemberClass() && !Modifier.isStatic(type.getModifiers()))
+				throw new RuntimeException("Class cannot be created (non-static member class): " + type.getName());
+			else
+				throw new RuntimeException("Class cannot be created (missing no-arg constructor): " + type.getName());
+		}
+
+		AccessClassLoader loader = AccessClassLoader.get(type);
 
 		String className = type.getName();
 		String accessClassName = className + "ConstructorAccess";
@@ -52,7 +63,7 @@ public abstract class ConstructorAccess<T> {
 		try {
 			return (ConstructorAccess)accessClass.newInstance();
 		} catch (Exception ex) {
-			throw new RuntimeException("Error constructing field access class: " + accessClassName, ex);
+			throw new RuntimeException("Error constructing constructor access class: " + accessClassName, ex);
 		}
 	}
 
