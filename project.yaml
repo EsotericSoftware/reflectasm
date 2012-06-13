@@ -1,3 +1,4 @@
 version: 1.04
 ---
 Build.build(project);
+Build.oneJAR(project);
