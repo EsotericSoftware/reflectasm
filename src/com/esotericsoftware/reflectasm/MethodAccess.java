@@ -32,6 +32,14 @@ public abstract class MethodAccess {
 			nextClass = nextClass.getSuperclass();
 		}
 
+		Class[][] parameterTypes = new Class[methods.size()][];
+		String[] methodNames = new String[methods.size()];
+		for (int i = 0, n = methodNames.length; i < n; i++) {
+			Method method = methods.get(i);
+			methodNames[i] = method.getName();
+			parameterTypes[i] = method.getParameterTypes();
+		}
+
 		String className = type.getName();
 		String accessClassName = className + "MethodAccess";
 		if (accessClassName.startsWith("java.")) accessClassName = "reflectasm." + accessClassName;
@@ -196,14 +204,16 @@ public abstract class MethodAccess {
 		}
 		try {
 			MethodAccess access = (MethodAccess)accessClass.newInstance();
-			access.methods = methods.toArray(new Method[methods.size()]);
+			access.methodNames = methodNames;
+			access.parameterTypes = parameterTypes;
 			return access;
 		} catch (Exception ex) {
 			throw new RuntimeException("Error constructing method access class: " + accessClassName, ex);
 		}
 	}
 
-	private Method[] methods;
+	private String[] methodNames;
+	private Class[][] parameterTypes;
 
 	abstract public Object invoke (Object object, int methodIndex, Object... args);
 
@@ -214,22 +224,22 @@ public abstract class MethodAccess {
 
 	/** Returns the index of the first method with the specified name. */
 	public int getIndex (String methodName) {
-		for (int i = 0, n = methods.length; i < n; i++) {
-			Method method = methods[i];
-			if (method.getName().equals(methodName)) return i;
-		}
+		for (int i = 0, n = methodNames.length; i < n; i++)
+			if (methodNames[i].equals(methodName)) return i;
 		throw new IllegalArgumentException("Unable to find public method: " + methodName);
 	}
 
-	public int getIndex (String methodName, Class... parameterTypes) {
-		for (int i = 0, n = methods.length; i < n; i++) {
-			Method method = methods[i];
-			if (method.getName().equals(methodName) && Arrays.equals(parameterTypes, method.getParameterTypes())) return i;
-		}
+	public int getIndex (String methodName, Class... paramTypes) {
+		for (int i = 0, n = methodNames.length; i < n; i++)
+			if (methodNames[i].equals(methodName) && Arrays.equals(paramTypes, parameterTypes[i])) return i;
 		throw new IllegalArgumentException("Unable to find public method: " + methodName + " " + Arrays.toString(parameterTypes));
 	}
 
-	public Method[] getMethods () {
-		return methods;
+	public String[] getMethodNames () {
+		return methodNames;
+	}
+
+	public Class[][] getParameterTypes () {
+		return parameterTypes;
 	}
 }

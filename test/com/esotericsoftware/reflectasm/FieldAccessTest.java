@@ -43,25 +43,25 @@ public class FieldAccessTest extends TestCase {
 			access.getIndex("name");
 			fail();
 		} catch (IllegalArgumentException expected) {
-			expected.printStackTrace();
+			// expected.printStackTrace();
 		}
 		try {
 			access.get(new EmptyClass(), "meow");
 			fail();
 		} catch (IllegalArgumentException expected) {
-			expected.printStackTrace();
+			// expected.printStackTrace();
 		}
 		try {
 			access.get(new EmptyClass(), 0);
 			fail();
 		} catch (IllegalArgumentException expected) {
-			expected.printStackTrace();
+			// expected.printStackTrace();
 		}
 		try {
 			access.set(new EmptyClass(), "foo", "moo");
 			fail();
 		} catch (IllegalArgumentException expected) {
-			expected.printStackTrace();
+			// expected.printStackTrace();
 		}
 	}
 

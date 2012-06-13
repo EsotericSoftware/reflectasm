@@ -31,6 +31,10 @@ public abstract class FieldAccess {
 			nextClass = nextClass.getSuperclass();
 		}
 
+		String[] fieldNames = new String[fields.size()];
+		for (int i = 0, n = fieldNames.length; i < n; i++)
+			fieldNames[i] = fields.get(i).getName();
+
 		String className = type.getName();
 		String accessClassName = className + "FieldAccess";
 		if (accessClassName.startsWith("java.")) accessClassName = "reflectasm." + accessClassName;
@@ -215,24 +219,22 @@ public abstract class FieldAccess {
 		}
 		try {
 			FieldAccess access = (FieldAccess)accessClass.newInstance();
-			access.fields = fields.toArray(new Field[fields.size()]);
+			access.fieldNames = fieldNames;
 			return access;
 		} catch (Exception ex) {
 			throw new RuntimeException("Error constructing field access class: " + accessClassName, ex);
 		}
 	}
 
-	private Field[] fields;
+	private String[] fieldNames;
 
 	abstract public void set (Object object, int fieldIndex, Object value);
 
 	abstract public Object get (Object object, int fieldIndex);
 
 	public int getIndex (String fieldName) {
-		for (int i = 0, n = fields.length; i < n; i++) {
-			Field field = fields[i];
-			if (field.getName().equals(fieldName)) return i;
-		}
+		for (int i = 0, n = fieldNames.length; i < n; i++)
+			if (fieldNames[i].equals(fieldName)) return i;
 		throw new IllegalArgumentException("Unable to find public field: " + fieldName);
 	}
 
@@ -244,7 +246,7 @@ public abstract class FieldAccess {
 		return get(object, getIndex(fieldName));
 	}
 
-	public Field[] getFields () {
-		return fields;
+	public String[] getFieldNames () {
+		return fieldNames;
 	}
 }

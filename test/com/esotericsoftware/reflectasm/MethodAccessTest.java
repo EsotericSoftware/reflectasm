@@ -43,31 +43,31 @@ public class MethodAccessTest extends TestCase {
 			access.getIndex("name");
 			fail();
 		} catch (IllegalArgumentException expected) {
-			expected.printStackTrace();
+			// expected.printStackTrace();
 		}
 		try {
 			access.getIndex("name", String.class);
 			fail();
 		} catch (IllegalArgumentException expected) {
-			expected.printStackTrace();
+			// expected.printStackTrace();
 		}
 		try {
 			access.invoke(new EmptyClass(), "meow", "moo");
 			fail();
 		} catch (IllegalArgumentException expected) {
-			expected.printStackTrace();
+			// expected.printStackTrace();
 		}
 		try {
 			access.invoke(new EmptyClass(), 0);
 			fail();
 		} catch (IllegalArgumentException expected) {
-			expected.printStackTrace();
+			// expected.printStackTrace();
 		}
 		try {
 			access.invoke(new EmptyClass(), 0, "moo");
 			fail();
 		} catch (IllegalArgumentException expected) {
-			expected.printStackTrace();
+			// expected.printStackTrace();
 		}
 	}
 
