@@ -10,11 +10,15 @@ class AccessClassLoader extends ClassLoader {
 
 	static AccessClassLoader get (Class type) {
 		ClassLoader parent = type.getClassLoader();
-		for (int i = 0, n = accessClassLoaders.size(); i < n; i++) {
-			AccessClassLoader accessClassLoader = accessClassLoaders.get(i);
-			if (accessClassLoader.getParent() == parent) return accessClassLoader;
+		synchronized (accessClassLoaders) {
+			for (int i = 0, n = accessClassLoaders.size(); i < n; i++) {
+				AccessClassLoader accessClassLoader = accessClassLoaders.get(i);
+				if (accessClassLoader.getParent() == parent) return accessClassLoader;
+			}
+			AccessClassLoader accessClassLoader = new AccessClassLoader(parent);
+			accessClassLoaders.add(accessClassLoader);
+			return accessClassLoader;
 		}
-		return new AccessClassLoader(parent);
 	}
 
 	private AccessClassLoader (ClassLoader parent) {
