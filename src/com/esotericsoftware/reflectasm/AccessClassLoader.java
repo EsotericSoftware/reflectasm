@@ -3,10 +3,9 @@ package com.esotericsoftware.reflectasm;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 class AccessClassLoader extends ClassLoader {
-	static private ArrayList<AccessClassLoader> accessClassLoaders = new ArrayList();
+	static private final ArrayList<AccessClassLoader> accessClassLoaders = new ArrayList();
 
 	static AccessClassLoader get (Class type) {
 		ClassLoader parent = type.getClassLoader();
@@ -40,7 +39,7 @@ class AccessClassLoader extends ClassLoader {
 			Method method = ClassLoader.class.getDeclaredMethod("defineClass", new Class[] {String.class, byte[].class, int.class,
 				int.class});
 			method.setAccessible(true);
-			return (Class)method.invoke(getParent(), new Object[] {name, bytes, new Integer(0), new Integer(bytes.length)});
+			return (Class)method.invoke(getParent(), new Object[] {name, bytes, Integer.valueOf(0), Integer.valueOf(bytes.length)});
 		} catch (Exception ignored) {
 		}
 		return defineClass(name, bytes, 0, bytes.length);
