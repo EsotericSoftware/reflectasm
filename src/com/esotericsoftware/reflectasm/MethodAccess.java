@@ -15,6 +15,37 @@ import org.objectweb.asm.Type;
 import static org.objectweb.asm.Opcodes.*;
 
 public abstract class MethodAccess {
+	private String[] methodNames;
+	private Class[][] parameterTypes;
+
+	abstract public Object invoke (Object object, int methodIndex, Object... args);
+
+	/** Invokes the first method with the specified name. */
+	public Object invoke (Object object, String methodName, Object... args) {
+		return invoke(object, getIndex(methodName), args);
+	}
+
+	/** Returns the index of the first method with the specified name. */
+	public int getIndex (String methodName) {
+		for (int i = 0, n = methodNames.length; i < n; i++)
+			if (methodNames[i].equals(methodName)) return i;
+		throw new IllegalArgumentException("Unable to find public method: " + methodName);
+	}
+
+	public int getIndex (String methodName, Class... paramTypes) {
+		for (int i = 0, n = methodNames.length; i < n; i++)
+			if (methodNames[i].equals(methodName) && Arrays.equals(paramTypes, parameterTypes[i])) return i;
+		throw new IllegalArgumentException("Unable to find public method: " + methodName + " " + Arrays.toString(parameterTypes));
+	}
+
+	public String[] getMethodNames () {
+		return methodNames;
+	}
+
+	public Class[][] getParameterTypes () {
+		return parameterTypes;
+	}
+
 	static public MethodAccess get (Class type) {
 		AccessClassLoader loader = AccessClassLoader.get(type);
 
@@ -210,36 +241,5 @@ public abstract class MethodAccess {
 		} catch (Exception ex) {
 			throw new RuntimeException("Error constructing method access class: " + accessClassName, ex);
 		}
-	}
-
-	private String[] methodNames;
-	private Class[][] parameterTypes;
-
-	abstract public Object invoke (Object object, int methodIndex, Object... args);
-
-	/** Invokes the first method with the specified name. */
-	public Object invoke (Object object, String methodName, Object... args) {
-		return invoke(object, getIndex(methodName), args);
-	}
-
-	/** Returns the index of the first method with the specified name. */
-	public int getIndex (String methodName) {
-		for (int i = 0, n = methodNames.length; i < n; i++)
-			if (methodNames[i].equals(methodName)) return i;
-		throw new IllegalArgumentException("Unable to find public method: " + methodName);
-	}
-
-	public int getIndex (String methodName, Class... paramTypes) {
-		for (int i = 0, n = methodNames.length; i < n; i++)
-			if (methodNames[i].equals(methodName) && Arrays.equals(paramTypes, parameterTypes[i])) return i;
-		throw new IllegalArgumentException("Unable to find public method: " + methodName + " " + Arrays.toString(parameterTypes));
-	}
-
-	public String[] getMethodNames () {
-		return methodNames;
-	}
-
-	public Class[][] getParameterTypes () {
-		return parameterTypes;
 	}
 }
