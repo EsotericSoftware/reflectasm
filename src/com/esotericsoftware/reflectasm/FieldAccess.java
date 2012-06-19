@@ -72,8 +72,6 @@ public abstract class FieldAccess {
 	abstract public float getFloat (Object instance, int fieldIndex);
 
 	static public FieldAccess get (Class type) {
-		AccessClassLoader loader = AccessClassLoader.get(type);
-
 		ArrayList<Field> fields = new ArrayList<Field>();
 		Class nextClass = type;
 		while (nextClass != Object.class) {
@@ -96,41 +94,41 @@ public abstract class FieldAccess {
 		String accessClassName = className + "FieldAccess";
 		if (accessClassName.startsWith("java.")) accessClassName = "reflectasm." + accessClassName;
 		Class accessClass = null;
-		try {
-			accessClass = loader.loadClass(accessClassName);
-		} catch (ClassNotFoundException ignored) {
-		}
-		if (accessClass == null) {
-			String accessClassNameInternal = accessClassName.replace('.', '/');
-			String classNameInternal = className.replace('.', '/');
 
-			ClassWriter cw = new ClassWriter(0);
-			cw.visit(V1_1, ACC_PUBLIC + ACC_SUPER, accessClassNameInternal, null, "com/esotericsoftware/reflectasm/FieldAccess",
-				null);
+		AccessClassLoader loader = AccessClassLoader.get(type);
+		synchronized (loader) {
+			try {
+				accessClass = loader.loadClass(accessClassName);
+			} catch (ClassNotFoundException ignored) {
+				String accessClassNameInternal = accessClassName.replace('.', '/');
+				String classNameInternal = className.replace('.', '/');
 
-			insertConstructor(cw);
-			insertGetObject(cw, classNameInternal, fields);
-			insertSetObject(cw, classNameInternal, fields);
-			insertGetPrimitive(cw, classNameInternal, fields, Type.BOOLEAN_TYPE);
-			insertSetPrimitive(cw, classNameInternal, fields, Type.BOOLEAN_TYPE);
-			insertGetPrimitive(cw, classNameInternal, fields, Type.BYTE_TYPE);
-			insertSetPrimitive(cw, classNameInternal, fields, Type.BYTE_TYPE);
-			insertGetPrimitive(cw, classNameInternal, fields, Type.SHORT_TYPE);
-			insertSetPrimitive(cw, classNameInternal, fields, Type.SHORT_TYPE);
-			insertGetPrimitive(cw, classNameInternal, fields, Type.INT_TYPE);
-			insertSetPrimitive(cw, classNameInternal, fields, Type.INT_TYPE);
-			insertGetPrimitive(cw, classNameInternal, fields, Type.LONG_TYPE);
-			insertSetPrimitive(cw, classNameInternal, fields, Type.LONG_TYPE);
-			insertGetPrimitive(cw, classNameInternal, fields, Type.DOUBLE_TYPE);
-			insertSetPrimitive(cw, classNameInternal, fields, Type.DOUBLE_TYPE);
-			insertGetPrimitive(cw, classNameInternal, fields, Type.FLOAT_TYPE);
-			insertSetPrimitive(cw, classNameInternal, fields, Type.FLOAT_TYPE);
-			insertGetPrimitive(cw, classNameInternal, fields, Type.CHAR_TYPE);
-			insertSetPrimitive(cw, classNameInternal, fields, Type.CHAR_TYPE);
-			insertGetString(cw, classNameInternal, fields);
-
-			cw.visitEnd();
-			accessClass = loader.defineClass(accessClassName, cw.toByteArray());
+				ClassWriter cw = new ClassWriter(0);
+				cw.visit(V1_1, ACC_PUBLIC + ACC_SUPER, accessClassNameInternal, null, "com/esotericsoftware/reflectasm/FieldAccess",
+					null);
+				insertConstructor(cw);
+				insertGetObject(cw, classNameInternal, fields);
+				insertSetObject(cw, classNameInternal, fields);
+				insertGetPrimitive(cw, classNameInternal, fields, Type.BOOLEAN_TYPE);
+				insertSetPrimitive(cw, classNameInternal, fields, Type.BOOLEAN_TYPE);
+				insertGetPrimitive(cw, classNameInternal, fields, Type.BYTE_TYPE);
+				insertSetPrimitive(cw, classNameInternal, fields, Type.BYTE_TYPE);
+				insertGetPrimitive(cw, classNameInternal, fields, Type.SHORT_TYPE);
+				insertSetPrimitive(cw, classNameInternal, fields, Type.SHORT_TYPE);
+				insertGetPrimitive(cw, classNameInternal, fields, Type.INT_TYPE);
+				insertSetPrimitive(cw, classNameInternal, fields, Type.INT_TYPE);
+				insertGetPrimitive(cw, classNameInternal, fields, Type.LONG_TYPE);
+				insertSetPrimitive(cw, classNameInternal, fields, Type.LONG_TYPE);
+				insertGetPrimitive(cw, classNameInternal, fields, Type.DOUBLE_TYPE);
+				insertSetPrimitive(cw, classNameInternal, fields, Type.DOUBLE_TYPE);
+				insertGetPrimitive(cw, classNameInternal, fields, Type.FLOAT_TYPE);
+				insertSetPrimitive(cw, classNameInternal, fields, Type.FLOAT_TYPE);
+				insertGetPrimitive(cw, classNameInternal, fields, Type.CHAR_TYPE);
+				insertSetPrimitive(cw, classNameInternal, fields, Type.CHAR_TYPE);
+				insertGetString(cw, classNameInternal, fields);
+				cw.visitEnd();
+				accessClass = loader.defineClass(accessClassName, cw.toByteArray());
+			}
 		}
 		try {
 			FieldAccess access = (FieldAccess)accessClass.newInstance();
@@ -539,7 +537,7 @@ public abstract class FieldAccess {
 		mv.visitInsn(DUP);
 		mv.visitTypeInsn(NEW, "java/lang/StringBuilder");
 		mv.visitInsn(DUP);
-		mv.visitLdcInsn("The field is not declared as " + fieldType + ": ");
+		mv.visitLdcInsn("Field not declared as " + fieldType + ": ");
 		mv.visitMethodInsn(INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "(Ljava/lang/String;)V");
 		mv.visitVarInsn(ILOAD, 2);
 		mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(I)Ljava/lang/StringBuilder;");
