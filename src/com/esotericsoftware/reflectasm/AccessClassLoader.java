@@ -20,6 +20,15 @@ class AccessClassLoader extends ClassLoader {
 		}
 	}
 
+	static void remove (ClassLoader parent) {
+		synchronized (accessClassLoaders) {
+			for (int i = accessClassLoaders.size() - 1; i >= 0; i--) {
+				AccessClassLoader accessClassLoader = accessClassLoaders.get(i);
+				if (accessClassLoader.getParent() == parent) accessClassLoaders.remove(i);
+			}
+		}
+	}
+
 	private AccessClassLoader (ClassLoader parent) {
 		super(parent);
 	}
