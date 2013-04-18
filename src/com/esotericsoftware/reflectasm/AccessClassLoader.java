@@ -53,6 +53,6 @@ class AccessClassLoader extends ClassLoader {
 				getClass().getProtectionDomain()});
 		} catch (Exception ignored) {
 		}
-		return defineClass(name, bytes, 0, bytes.length);
+		return defineClass(name, bytes, 0, bytes.length, getClass().getProtectionDomain());
 	}
 }
