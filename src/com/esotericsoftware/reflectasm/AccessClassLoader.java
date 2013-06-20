@@ -15,6 +15,7 @@ class AccessClassLoader extends ClassLoader {
 				AccessClassLoader accessClassLoader = accessClassLoaders.get(i);
 				if (accessClassLoader.getParent() == parent) return accessClassLoader;
 			}
+			if(parent == null) parent = ClassLoader.getSystemClassLoader();
 			AccessClassLoader accessClassLoader = new AccessClassLoader(parent);
 			accessClassLoaders.add(accessClassLoader);
 			return accessClassLoader;
