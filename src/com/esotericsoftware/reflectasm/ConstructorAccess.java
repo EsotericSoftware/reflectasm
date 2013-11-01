@@ -49,14 +49,14 @@ public abstract class ConstructorAccess<T> {
 				if (!isNonStaticMemberClass) {
 					enclosingClassNameInternal = null;
 					try {
-						type.getConstructor((Class[])null);
+						type.getDeclaredConstructor((Class[])null);
 					} catch (Exception ex) {
 						throw new RuntimeException("Class cannot be created (missing no-arg constructor): " + type.getName());
 					}
 				} else {
 					enclosingClassNameInternal = enclosingType.getName().replace('.', '/');
 					try {
-						type.getConstructor(enclosingType); // Inner classes should have this.
+						type.getDeclaredConstructor(enclosingType); // Inner classes should have this.
 					} catch (Exception ex) {
 						throw new RuntimeException("Non-static member class cannot be created (missing enclosing class constructor): "
 							+ type.getName());
