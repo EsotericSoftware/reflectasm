@@ -1,4 +1,4 @@
-![](https://raw.github.com/wiki/EsotericSoftware/reflectasm/images/logo.jpg)
+![](https://raw.github.com/wiki/EsotericSoftware/reflectasm/images/logo.png)
 
 ## Overview
 
