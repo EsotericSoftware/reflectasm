@@ -14,8 +14,7 @@ import org.objectweb.asm.Type;
 
 public abstract class FieldAccess {
 	private String[] fieldNames;
-
-	private Class<?>[] fieldTypes;
+	private Class[] fieldTypes;
 
 	public int getIndex (String fieldName) {
 		for (int i = 0, n = fieldNames.length; i < n; i++)
@@ -35,24 +34,12 @@ public abstract class FieldAccess {
 		return fieldNames;
 	}
 
-	public Class<?>[] getFieldTypes () {
+	public Class[] getFieldTypes () {
 		return fieldTypes;
-	}
-
-	public Class<?> getFieldType (String fieldName) {
-		return getFieldType(getIndex(fieldName));
 	}
 
 	public int getFieldCount () {
 		return fieldTypes.length;
-	}
-
-	public Class<?> getFieldType (int fieldIndex) {
-		return fieldTypes[fieldIndex];
-	}
-
-	public String getFieldName (int fieldIndex) {
-		return fieldNames[fieldIndex];
 	}
 
 	abstract public void set (Object instance, int fieldIndex, Object value);
@@ -109,7 +96,7 @@ public abstract class FieldAccess {
 		}
 
 		String[] fieldNames = new String[fields.size()];
-		Class<?>[] fieldTypes = new Class<?>[fields.size()];
+		Class[] fieldTypes = new Class[fields.size()];
 		for (int i = 0, n = fieldNames.length; i < n; i++) {
 			fieldNames[i] = fields.get(i).getName();
 			fieldTypes[i] = fields.get(i).getType();
