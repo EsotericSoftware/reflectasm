@@ -1,4 +1,7 @@
+
 package com.esotericsoftware.reflectasm;
+
+import static org.objectweb.asm.Opcodes.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -9,12 +12,9 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 
-import static org.objectweb.asm.Opcodes.*;
-
 public abstract class FieldAccess {
 	private String[] fieldNames;
-	
-	//added
+
 	private Class<?>[] fieldTypes;
 
 	public int getIndex (String fieldName) {
@@ -34,29 +34,24 @@ public abstract class FieldAccess {
 	public String[] getFieldNames () {
 		return fieldNames;
 	}
-	
-	//added
-	public Class<?>[] getFieldTypes() {
+
+	public Class<?>[] getFieldTypes () {
 		return fieldTypes;
 	}
-	
-	//added
-	public Class<?> getFieldType(String fieldName) {
+
+	public Class<?> getFieldType (String fieldName) {
 		return getFieldType(getIndex(fieldName));
 	}
-	
-	//added
-	public int getFieldCount() {
+
+	public int getFieldCount () {
 		return fieldTypes.length;
 	}
-	
-	//added
-	public Class<?> getFieldType(int fieldIndex) {
+
+	public Class<?> getFieldType (int fieldIndex) {
 		return fieldTypes[fieldIndex];
 	}
-	
-	//added
-	public String getFieldName(int fieldIndex) {
+
+	public String getFieldName (int fieldIndex) {
 		return fieldNames[fieldIndex];
 	}
 
@@ -114,10 +109,10 @@ public abstract class FieldAccess {
 		}
 
 		String[] fieldNames = new String[fields.size()];
-		Class<?>[] fieldTypes = new Class<?>[fields.size()]; //added
+		Class<?>[] fieldTypes = new Class<?>[fields.size()];
 		for (int i = 0, n = fieldNames.length; i < n; i++) {
 			fieldNames[i] = fields.get(i).getName();
-			fieldTypes[i] = fields.get(i).getType(); //added
+			fieldTypes[i] = fields.get(i).getType();
 		}
 
 		String className = type.getName();
@@ -163,7 +158,7 @@ public abstract class FieldAccess {
 		try {
 			FieldAccess access = (FieldAccess)accessClass.newInstance();
 			access.fieldNames = fieldNames;
-			access.fieldTypes = fieldTypes; //added
+			access.fieldTypes = fieldTypes;
 			return access;
 		} catch (Exception ex) {
 			throw new RuntimeException("Error constructing field access class: " + accessClassName, ex);
