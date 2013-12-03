@@ -1,4 +1,3 @@
-
 package com.esotericsoftware.reflectasm;
 
 import java.lang.reflect.Field;
@@ -14,6 +13,9 @@ import static org.objectweb.asm.Opcodes.*;
 
 public abstract class FieldAccess {
 	private String[] fieldNames;
+	
+	//added
+	private Class<?>[] fieldTypes;
 
 	public int getIndex (String fieldName) {
 		for (int i = 0, n = fieldNames.length; i < n; i++)
@@ -31,6 +33,31 @@ public abstract class FieldAccess {
 
 	public String[] getFieldNames () {
 		return fieldNames;
+	}
+	
+	//added
+	public Class<?>[] getFieldTypes() {
+		return fieldTypes;
+	}
+	
+	//added
+	public Class<?> getFieldType(String fieldName) {
+		return getFieldType(getIndex(fieldName));
+	}
+	
+	//added
+	public int getFieldCount() {
+		return fieldTypes.length;
+	}
+	
+	//added
+	public Class<?> getFieldType(int fieldIndex) {
+		return fieldTypes[fieldIndex];
+	}
+	
+	//added
+	public String getFieldName(int fieldIndex) {
+		return fieldNames[fieldIndex];
 	}
 
 	abstract public void set (Object instance, int fieldIndex, Object value);
@@ -87,8 +114,11 @@ public abstract class FieldAccess {
 		}
 
 		String[] fieldNames = new String[fields.size()];
-		for (int i = 0, n = fieldNames.length; i < n; i++)
+		Class<?>[] fieldTypes = new Class<?>[fields.size()]; //added
+		for (int i = 0, n = fieldNames.length; i < n; i++) {
 			fieldNames[i] = fields.get(i).getName();
+			fieldTypes[i] = fields.get(i).getType(); //added
+		}
 
 		String className = type.getName();
 		String accessClassName = className + "FieldAccess";
@@ -133,6 +163,7 @@ public abstract class FieldAccess {
 		try {
 			FieldAccess access = (FieldAccess)accessClass.newInstance();
 			access.fieldNames = fieldNames;
+			access.fieldTypes = fieldTypes; //added
 			return access;
 		} catch (Exception ex) {
 			throw new RuntimeException("Error constructing field access class: " + accessClassName, ex);

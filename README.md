@@ -55,6 +55,17 @@ For maximum performance when methods or fields are accessed repeatedly, the meth
         access.invoke(someObject, addNameIndex, "Awesome McLovin");
 ```
 
+Iterate all fields:
+
+```java
+    FieldAccess access = FieldAccess.get(SomeClass.class);
+    for(int i = 0, n = access.getFieldCount(); i < n; i++) {
+        access.set(instanceObject, i, valueToPut);              
+    }
+ }
+
+```
+
 ## Visibility
 
 ReflectASM can always access public members. An attempt is made to define access classes in the same classloader (using setAccessible) and package as the accessed class. If the security manager allows setAccessible to succeed, then protected and default access (package private) members can be accessed. If setAccessible fails, no exception is thrown, but only public members can be accessed. Private members can never be accessed.
