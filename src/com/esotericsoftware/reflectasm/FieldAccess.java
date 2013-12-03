@@ -47,7 +47,7 @@ public abstract class FieldAccess {
 	
 	//added
 	public int getFieldCount() {
-		return fieldNames.length;
+		return fieldTypes.length;
 	}
 	
 	//added
