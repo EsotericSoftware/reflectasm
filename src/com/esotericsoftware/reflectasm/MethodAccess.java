@@ -1,4 +1,3 @@
-
 package com.esotericsoftware.reflectasm;
 
 import java.lang.reflect.Method;
@@ -27,7 +26,7 @@ public abstract class MethodAccess {
 
 	/** Invokes the first method with the specified name and the specified number of arguments. */
 	public Object invoke (Object object, String methodName, Object... args) {
-		return invoke(object, getIndex(methodName, args.length), args);
+		return invoke(object, getIndex(methodName, args==null ? 0 : args.length), args);
 	}
 
 	/** Returns the index of the first method with the specified name. */
