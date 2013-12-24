@@ -1,3 +1,4 @@
+
 package com.esotericsoftware.reflectasm;
 
 import java.lang.reflect.Method;
@@ -16,6 +17,7 @@ import static org.objectweb.asm.Opcodes.*;
 public abstract class MethodAccess {
 	private String[] methodNames;
 	private Class[][] parameterTypes;
+	private Class[] returnTypes;
 
 	abstract public Object invoke (Object object, int methodIndex, Object... args);
 
@@ -57,6 +59,10 @@ public abstract class MethodAccess {
 	public Class[][] getParameterTypes () {
 		return parameterTypes;
 	}
+	
+	public Class[] getReturnTypes () {
+		return returnTypes;
+	}
 
 	static public MethodAccess get (Class type) {
 		ArrayList<Method> methods = new ArrayList<Method>();
@@ -72,12 +78,15 @@ public abstract class MethodAccess {
 			recursiveAddInterfaceMethodsToList(type, methods);
 		}
 
-		Class[][] parameterTypes = new Class[methods.size()][];
-		String[] methodNames = new String[methods.size()];
-		for (int i = 0, n = methodNames.length; i < n; i++) {
+		int n = methods.size();
+		String[] methodNames = new String[n];
+		Class[][] parameterTypes = new Class[n][];
+		Class[] returnTypes = new Class[n];
+		for (int i = 0; i < n; i++) {
 			Method method = methods.get(i);
 			methodNames[i] = method.getName();
 			parameterTypes[i] = method.getParameterTypes();
+			returnTypes[i] = method.getReturnType();
 		}
 
 		String className = type.getName();
@@ -117,14 +126,14 @@ public abstract class MethodAccess {
 						mv.visitVarInsn(ASTORE, 4);
 
 						mv.visitVarInsn(ILOAD, 2);
-						Label[] labels = new Label[methods.size()];
-						for (int i = 0, n = labels.length; i < n; i++)
+						Label[] labels = new Label[n];
+						for (int i = 0; i < n; i++)
 							labels[i] = new Label();
 						Label defaultLabel = new Label();
 						mv.visitTableSwitchInsn(0, labels.length - 1, defaultLabel, labels);
 
 						StringBuilder buffer = new StringBuilder(128);
-						for (int i = 0, n = labels.length; i < n; i++) {
+						for (int i = 0; i < n; i++) {
 							mv.visitLabel(labels[i]);
 							if (i == 0)
 								mv.visitFrame(Opcodes.F_APPEND, 1, new Object[] {classNameInternal}, 0, null);
@@ -135,8 +144,9 @@ public abstract class MethodAccess {
 							buffer.setLength(0);
 							buffer.append('(');
 
-							Method method = methods.get(i);
-							Class[] paramTypes = method.getParameterTypes();
+							String methodName = methodNames[i];
+							Class[] paramTypes = parameterTypes[i];
+							Class returnType = returnTypes[i];
 							for (int paramIndex = 0; paramIndex < paramTypes.length; paramIndex++) {
 								mv.visitVarInsn(ALOAD, 3);
 								mv.visitIntInsn(BIPUSH, paramIndex);
@@ -186,10 +196,10 @@ public abstract class MethodAccess {
 							}
 
 							buffer.append(')');
-							buffer.append(Type.getDescriptor(method.getReturnType()));
-							mv.visitMethodInsn(isInterface ? INVOKEINTERFACE : INVOKEVIRTUAL, classNameInternal, method.getName(), buffer.toString());
+							buffer.append(Type.getDescriptor(returnType));
+							mv.visitMethodInsn(isInterface ? INVOKEINTERFACE : INVOKEVIRTUAL, classNameInternal, methodName, buffer.toString());
 
-							switch (Type.getType(method.getReturnType()).getSort()) {
+							switch (Type.getType(returnType).getSort()) {
 							case Type.VOID:
 								mv.visitInsn(ACONST_NULL);
 								break;
@@ -248,6 +258,7 @@ public abstract class MethodAccess {
 			MethodAccess access = (MethodAccess)accessClass.newInstance();
 			access.methodNames = methodNames;
 			access.parameterTypes = parameterTypes;
+			access.returnTypes = returnTypes;
 			return access;
 		} catch (Exception ex) {
 			throw new RuntimeException("Error constructing method access class: " + accessClassName, ex);
