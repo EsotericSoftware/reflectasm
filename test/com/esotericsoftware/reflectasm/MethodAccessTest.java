@@ -1,7 +1,12 @@
 
 package com.esotericsoftware.reflectasm;
 
-import com.esotericsoftware.reflectasm.FieldAccessTest.EmptyClass;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import static junit.framework.Assert.assertEquals;
 
 import junit.framework.TestCase;
 
@@ -71,6 +76,21 @@ public class MethodAccessTest extends TestCase {
 		}
 	}
 
+	public void testInvokeInterface () {
+		MethodAccess access = MethodAccess.get(ConcurrentMap.class);
+		ConcurrentHashMap<String, String> someMap = new ConcurrentHashMap<String, String>();
+		someMap.put("first", "one");
+		someMap.put("second", "two");
+		Object value;
+
+		// invoke a method declared directly in the ConcurrentMap interface
+		value = access.invoke(someMap, "replace", "first", "foo"); 
+		assertEquals("one", value);
+		// invoke a method declared in the Map superinterface
+		value = access.invoke(someMap, "size");
+		assertEquals(someMap.size(), value);
+	}
+
 	static public class EmptyClass {
 	}
 
@@ -98,4 +118,5 @@ public class MethodAccessTest extends TestCase {
 			return "test";
 		}
 	}
+	
 }
