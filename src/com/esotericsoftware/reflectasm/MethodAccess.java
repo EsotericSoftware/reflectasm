@@ -20,6 +20,11 @@ public abstract class MethodAccess {
 
 	abstract public Object invoke (Object object, int methodIndex, Object... args);
 
+	/** Invokes the method with the specified name and the specified param types. */
+	public Object invoke (Object object, String methodName, Class[] paramTypes, Object... args) {
+		return invoke(object, getIndex(methodName, paramTypes), args);
+	}
+
 	/** Invokes the first method with the specified name and the specified number of arguments. */
 	public Object invoke (Object object, String methodName, Object... args) {
 		return invoke(object, getIndex(methodName, args.length), args);
