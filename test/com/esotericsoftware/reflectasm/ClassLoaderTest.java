@@ -73,7 +73,7 @@ public class ClassLoaderTest extends TestCase {
 		}
 
 		// Yeah, both reclaimed!
-		assertEquals(initialCount, AccessClassLoader.activeAccessClassLoaders());
+		assertEquals(1, AccessClassLoader.activeAccessClassLoaders());
 	}
 
 	public void testRemoveClassloaders () throws Exception {
