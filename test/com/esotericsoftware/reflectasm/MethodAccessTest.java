@@ -1,9 +1,6 @@
 
 package com.esotericsoftware.reflectasm;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import static junit.framework.Assert.assertEquals;
