@@ -1,16 +1,15 @@
 
 package com.esotericsoftware.reflectasm;
 
+import static org.objectweb.asm.Opcodes.*;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 
-import static org.objectweb.asm.Opcodes.*;
-
 public abstract class ConstructorAccess<T> {
-
 	boolean isNonStaticMemberClass;
 
 	public boolean isNonStaticMemberClass () {
@@ -69,7 +68,8 @@ public abstract class ConstructorAccess<T> {
 							+ type.getName(), ex);
 					}
 					if (isPrivate) {
-						throw new RuntimeException("Non-static member class cannot be created (the enclosing class constructor is private): " + type.getName());
+						throw new RuntimeException(
+							"Non-static member class cannot be created (the enclosing class constructor is private): " + type.getName());
 					}
 				}
 

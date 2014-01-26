@@ -1,6 +1,8 @@
 
 package com.esotericsoftware.reflectasm;
 
+import static org.objectweb.asm.Opcodes.*;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -11,8 +13,6 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
-
-import static org.objectweb.asm.Opcodes.*;
 
 public abstract class MethodAccess {
 	private String[] methodNames;
@@ -28,7 +28,7 @@ public abstract class MethodAccess {
 
 	/** Invokes the first method with the specified name and the specified number of arguments. */
 	public Object invoke (Object object, String methodName, Object... args) {
-		return invoke(object, getIndex(methodName, args==null ? 0 : args.length), args);
+		return invoke(object, getIndex(methodName, args == null ? 0 : args.length), args);
 	}
 
 	/** Returns the index of the first method with the specified name. */
@@ -48,7 +48,7 @@ public abstract class MethodAccess {
 	/** Returns the index of the first method with the specified name and the specified number of arguments. */
 	public int getIndex (String methodName, int paramsCount) {
 		for (int i = 0, n = methodNames.length; i < n; i++)
-			if (methodNames[i].equals(methodName) && parameterTypes[i].length==paramsCount) return i;
+			if (methodNames[i].equals(methodName) && parameterTypes[i].length == paramsCount) return i;
 		throw new IllegalArgumentException("Unable to find public method: " + methodName + " with " + paramsCount + " params.");
 	}
 
@@ -59,7 +59,7 @@ public abstract class MethodAccess {
 	public Class[][] getParameterTypes () {
 		return parameterTypes;
 	}
-	
+
 	public Class[] getReturnTypes () {
 		return returnTypes;
 	}
@@ -73,8 +73,7 @@ public abstract class MethodAccess {
 				addDeclaredMethodsToList(nextClass, methods);
 				nextClass = nextClass.getSuperclass();
 			}
-		}
-		else {
+		} else {
 			recursiveAddInterfaceMethodsToList(type, methods);
 		}
 
@@ -197,7 +196,8 @@ public abstract class MethodAccess {
 
 							buffer.append(')');
 							buffer.append(Type.getDescriptor(returnType));
-							mv.visitMethodInsn(isInterface ? INVOKEINTERFACE : INVOKEVIRTUAL, classNameInternal, methodName, buffer.toString());
+							mv.visitMethodInsn(isInterface ? INVOKEINTERFACE : INVOKEVIRTUAL, classNameInternal, methodName,
+								buffer.toString());
 
 							switch (Type.getType(returnType).getSort()) {
 							case Type.VOID:
@@ -264,8 +264,8 @@ public abstract class MethodAccess {
 			throw new RuntimeException("Error constructing method access class: " + accessClassName, ex);
 		}
 	}
-	
-	private static void addDeclaredMethodsToList(Class type, ArrayList<Method> methods) {
+
+	private static void addDeclaredMethodsToList (Class type, ArrayList<Method> methods) {
 		Method[] declaredMethods = type.getDeclaredMethods();
 		for (int i = 0, n = declaredMethods.length; i < n; i++) {
 			Method method = declaredMethods[i];
@@ -275,8 +275,8 @@ public abstract class MethodAccess {
 			methods.add(method);
 		}
 	}
-	
-	private static void recursiveAddInterfaceMethodsToList(Class interfaceType, ArrayList<Method> methods) {
+
+	private static void recursiveAddInterfaceMethodsToList (Class interfaceType, ArrayList<Method> methods) {
 		addDeclaredMethodsToList(interfaceType, methods);
 		for (Class nextInterface : interfaceType.getInterfaces()) {
 			recursiveAddInterfaceMethodsToList(nextInterface, methods);
