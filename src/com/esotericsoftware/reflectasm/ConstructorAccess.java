@@ -1,6 +1,7 @@
 
 package com.esotericsoftware.reflectasm;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 
 import org.objectweb.asm.ClassWriter;
@@ -46,20 +47,29 @@ public abstract class ConstructorAccess<T> {
 				String classNameInternal = className.replace('.', '/');
 				String enclosingClassNameInternal;
 
+				boolean isPrivate = false;
 				if (!isNonStaticMemberClass) {
 					enclosingClassNameInternal = null;
 					try {
-						type.getDeclaredConstructor((Class[])null);
+						Constructor<T> constructor = type.getDeclaredConstructor((Class[])null);
+						isPrivate = Modifier.isPrivate(constructor.getModifiers());
 					} catch (Exception ex) {
-						throw new RuntimeException("Class cannot be created (missing no-arg constructor): " + type.getName());
+						throw new RuntimeException("Class cannot be created (missing no-arg constructor): " + type.getName(), ex);
+					}
+					if (isPrivate) {
+						throw new RuntimeException("Class cannot be created (the no-arg constructor is private): " + type.getName());
 					}
 				} else {
 					enclosingClassNameInternal = enclosingType.getName().replace('.', '/');
 					try {
-						type.getDeclaredConstructor(enclosingType); // Inner classes should have this.
+						Constructor<T> constructor = type.getDeclaredConstructor(enclosingType); // Inner classes should have this.
+						isPrivate = Modifier.isPrivate(constructor.getModifiers());
 					} catch (Exception ex) {
 						throw new RuntimeException("Non-static member class cannot be created (missing enclosing class constructor): "
-							+ type.getName());
+							+ type.getName(), ex);
+					}
+					if (isPrivate) {
+						throw new RuntimeException("Non-static member class cannot be created (the enclosing class constructor is private): " + type.getName());
 					}
 				}
 
