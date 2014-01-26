@@ -170,6 +170,7 @@ public class ConstructorAccessTest extends TestCase {
 	}
 
 	static public class HasProtectedConstructor extends HasPrivateConstructor {
+		@SuppressWarnings("synthetic-access")
 		protected HasProtectedConstructor () {
 			super();
 		}
