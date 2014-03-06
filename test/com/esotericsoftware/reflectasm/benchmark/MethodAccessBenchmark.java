@@ -16,6 +16,7 @@ public class MethodAccessBenchmark extends Benchmark {
 		int index = access.getIndex("getName");
 
 		Method method = SomeClass.class.getMethod("getName");
+		// method.setAccessible(true); // Improves reflection a bit.
 
 		for (int i = 0; i < 100; i++) {
 			for (int ii = 0; ii < count; ii++)
