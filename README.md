@@ -21,26 +21,26 @@ The source code for these benchmarks is included in the project. The above chart
 Method reflection with ReflectASM:
 
 ```java
-    SomeClass someObject = ...
-    MethodAccess access = MethodAccess.get(SomeClass.class);
-    access.invoke(someObject, "setName", "Awesome McLovin");
-    String name = (String)access.invoke(someObject, "getName");
+SomeClass someObject = ...
+MethodAccess access = MethodAccess.get(SomeClass.class);
+access.invoke(someObject, "setName", "Awesome McLovin");
+String name = (String)access.invoke(someObject, "getName");
 ```
 
 Field reflection with ReflectASM:
 
 ```java
-    SomeClass someObject = ...
-    FieldAccess access = FieldAccess.get(SomeClass.class);
-    access.set(someObject, "name", "Awesome McLovin");
-    String name = (String)access.get(someObject, "name");
+SomeClass someObject = ...
+FieldAccess access = FieldAccess.get(SomeClass.class);
+access.set(someObject, "name", "Awesome McLovin");
+String name = (String)access.get(someObject, "name");
 ```
 
 Constructor reflection with ReflectASM:
 
 ```java
-    ConstructorAccess<SomeClass> access = ConstructorAccess.get(SomeClass.class);
-    SomeClass someObject = access.newInstance();
+ConstructorAccess<SomeClass> access = ConstructorAccess.get(SomeClass.class);
+SomeClass someObject = access.newInstance();
 ```
 
 ## Avoiding Name Lookup
@@ -48,22 +48,20 @@ Constructor reflection with ReflectASM:
 For maximum performance when methods or fields are accessed repeatedly, the method or field index should be used instead of the name:
 
 ```java
-    SomeClass someObject = ...
-    MethodAccess access = MethodAccess.get(SomeClass.class);
-    int addNameIndex = access.getIndex("addName");
-    for (String name : names)
-        access.invoke(someObject, addNameIndex, "Awesome McLovin");
+SomeClass someObject = ...
+MethodAccess access = MethodAccess.get(SomeClass.class);
+int addNameIndex = access.getIndex("addName");
+for (String name : names)
+    access.invoke(someObject, addNameIndex, "Awesome McLovin");
 ```
 
 Iterate all fields:
 
 ```java
-    FieldAccess access = FieldAccess.get(SomeClass.class);
-    for(int i = 0, n = access.getFieldCount(); i < n; i++) {
-        access.set(instanceObject, i, valueToPut);              
-    }
- }
-
+FieldAccess access = FieldAccess.get(SomeClass.class);
+for(int i = 0, n = access.getFieldCount(); i < n; i++) {
+    access.set(instanceObject, i, valueToPut);              
+}
 ```
 
 ## Visibility
@@ -74,21 +72,25 @@ ReflectASM can always access public members. An attempt is made to define access
 
 Stack traces when using ReflectASM are a bit cleaner. Here is Java's reflection calling a method that throws a RuntimeException:
 
-    Exception in thread "main" java.lang.reflect.InvocationTargetException
-    	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-    	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
-    	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
-    	at java.lang.reflect.Method.invoke(Method.java:597)
-    	at com.example.SomeCallingCode.doit(SomeCallingCode.java:22)
-    Caused by: java.lang.RuntimeException
-    	at com.example.SomeClass.someMethod(SomeClass.java:48)
-    	... 5 more
+```
+Exception in thread "main" java.lang.reflect.InvocationTargetException
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:597)
+	at com.example.SomeCallingCode.doit(SomeCallingCode.java:22)
+Caused by: java.lang.RuntimeException
+	at com.example.SomeClass.someMethod(SomeClass.java:48)
+	... 5 more
+```
 
 Here is the same but when ReflectASM is used:
 
-    Exception in thread "main" java.lang.RuntimeException
-    	at com.example.SomeClass.someMethod(SomeClass.java:48)
-    	at com.example.SomeClassMethodAccess.invoke(Unknown Source)
-    	at com.example.SomeCallingCode.doit(SomeCallingCode.java:22)
+```
+Exception in thread "main" java.lang.RuntimeException
+	at com.example.SomeClass.someMethod(SomeClass.java:48)
+	at com.example.SomeClassMethodAccess.invoke(Unknown Source)
+	at com.example.SomeCallingCode.doit(SomeCallingCode.java:22)
+```
 
 If ReflectASM is used to invoke code that throws a checked exception, the checked exception is thrown. Because it is a compilation error to use try/catch with a checked exception around code that doesn't declare that exception as being thrown, you must catch Exception if you care about catching a checked exception in code you invoke with ReflectASM.
