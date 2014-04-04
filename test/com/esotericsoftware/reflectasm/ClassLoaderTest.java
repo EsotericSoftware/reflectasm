@@ -12,7 +12,6 @@ import junit.framework.TestCase;
 
 public class ClassLoaderTest extends TestCase {
 	public void testDifferentClassloaders () throws Exception {
-		// This classloader can see only the Test class and core Java classes.
 		ClassLoader testClassLoader = new TestClassLoader1();
 		Class testClass = testClassLoader.loadClass("com.esotericsoftware.reflectasm.ClassLoaderTest$Test");
 		Object testObject = testClass.newInstance();
@@ -43,8 +42,8 @@ public class ClassLoaderTest extends TestCase {
 		assertEquals("second", testObject2.toString());
 		assertEquals("second", access2.get(testObject2, "name"));
 		
-		assertEquals(access1.getClass().toString(), access2.getClass().toString()); // Same class names
-		assertFalse(access1.getClass().equals(access2.getClass())); // But different classes
+		assertEquals(access1.classAccessor.getClass().toString(), access2.classAccessor.getClass().toString()); // Same class names
+		assertFalse(access1.classAccessor.getClass().equals(access2.classAccessor.getClass())); // But different classes
 		
 		assertEquals(initialCount+2, AccessClassLoader.activeAccessClassLoaders());
 		
@@ -95,8 +94,8 @@ public class ClassLoaderTest extends TestCase {
 		assertEquals("second", testObject2.toString());
 		assertEquals("second", access2.get(testObject2, "name"));
 		
-		assertEquals(access1.getClass().toString(), access2.getClass().toString()); // Same class names
-		assertFalse(access1.getClass().equals(access2.getClass())); // But different classes
+		assertEquals(access1.classAccessor.getClass().toString(), access2.classAccessor.getClass().toString()); // Same class names
+		assertFalse(access1.classAccessor.getClass().equals(access2.classAccessor.getClass())); // But different classes
 		
 		assertEquals(initialCount+2, AccessClassLoader.activeAccessClassLoaders());
 		
@@ -120,9 +119,8 @@ public class ClassLoaderTest extends TestCase {
 		protected synchronized Class<?> loadClass (String name, boolean resolve) throws ClassNotFoundException {
 			Class c = findLoadedClass(name);
 			if (c != null) return c;
-			if (name.startsWith("java.")) return super.loadClass(name, resolve);
-			if (!name.equals("com.esotericsoftware.reflectasm.ClassLoaderTest$Test"))
-				throw new ClassNotFoundException("Class not found on purpose: " + name);
+			if (!name.startsWith("com.esotericsoftware.reflectasm.ClassLoaderTest"))
+                return super.loadClass(name, resolve);
 			ByteArrayOutputStream output = new ByteArrayOutputStream(32 * 1024);
 			InputStream input = ClassLoaderTest.class.getResourceAsStream("/" + name.replace('.', '/') + ".class");
 			if (input == null) return null;
