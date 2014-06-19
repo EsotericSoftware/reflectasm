@@ -60,7 +60,9 @@
         			<groupId>org.apache.maven.plugins</groupId>
         			<artifactId>maven-compiler-plugin</artifactId>
         			<version>3.1</version>
+				 
         			<configuration>
+					<compilerArgument>-XDignore.symbol.file</compilerArgument>
           				<source>1.5</source>
           				<target>1.5</target>
         			</configuration>
