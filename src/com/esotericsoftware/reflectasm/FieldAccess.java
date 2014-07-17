@@ -19,7 +19,7 @@ public abstract class FieldAccess {
 	public int getIndex (String fieldName) {
 		for (int i = 0, n = fieldNames.length; i < n; i++)
 			if (fieldNames[i].equals(fieldName)) return i;
-		throw new IllegalArgumentException("Unable to find public field: " + fieldName);
+		throw new IllegalArgumentException("Unable to find non-private field: " + fieldName);
 	}
 
 	public void set (Object instance, String fieldName, Object value) {
@@ -147,8 +147,8 @@ public abstract class FieldAccess {
 			access.fieldNames = fieldNames;
 			access.fieldTypes = fieldTypes;
 			return access;
-		} catch (Exception ex) {
-			throw new RuntimeException("Error constructing field access class: " + accessClassName, ex);
+		} catch (Throwable t) {
+			throw new RuntimeException("Error constructing field access class: " + accessClassName, t);
 		}
 	}
 
