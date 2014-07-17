@@ -35,21 +35,21 @@ public abstract class MethodAccess {
 	public int getIndex (String methodName) {
 		for (int i = 0, n = methodNames.length; i < n; i++)
 			if (methodNames[i].equals(methodName)) return i;
-		throw new IllegalArgumentException("Unable to find public method: " + methodName);
+		throw new IllegalArgumentException("Unable to find non-private method: " + methodName);
 	}
 
 	/** Returns the index of the first method with the specified name and param types. */
 	public int getIndex (String methodName, Class... paramTypes) {
 		for (int i = 0, n = methodNames.length; i < n; i++)
 			if (methodNames[i].equals(methodName) && Arrays.equals(paramTypes, parameterTypes[i])) return i;
-		throw new IllegalArgumentException("Unable to find public method: " + methodName + " " + Arrays.toString(paramTypes));
+		throw new IllegalArgumentException("Unable to find non-private method: " + methodName + " " + Arrays.toString(paramTypes));
 	}
 
 	/** Returns the index of the first method with the specified name and the specified number of arguments. */
 	public int getIndex (String methodName, int paramsCount) {
 		for (int i = 0, n = methodNames.length; i < n; i++)
 			if (methodNames[i].equals(methodName) && parameterTypes[i].length == paramsCount) return i;
-		throw new IllegalArgumentException("Unable to find public method: " + methodName + " with " + paramsCount + " params.");
+		throw new IllegalArgumentException("Unable to find non-private method: " + methodName + " with " + paramsCount + " params.");
 	}
 
 	public String[] getMethodNames () {
@@ -260,8 +260,8 @@ public abstract class MethodAccess {
 			access.parameterTypes = parameterTypes;
 			access.returnTypes = returnTypes;
 			return access;
-		} catch (Exception ex) {
-			throw new RuntimeException("Error constructing method access class: " + accessClassName, ex);
+		} catch (Throwable t) {
+			throw new RuntimeException("Error constructing method access class: " + accessClassName, t);
 		}
 	}
 
