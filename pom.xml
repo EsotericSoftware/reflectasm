@@ -9,7 +9,7 @@
 	<packaging>jar</packaging>
 	<name>ReflectASM</name>
 	<description>High performance Java reflection using code generation</description>
-	<url>http://code.google.com/p/reflectasm/</url>
+	<url>https://github.com/EsotericSoftware/reflectasm</url>
 
 	<licenses>
 		<license>
@@ -20,8 +20,9 @@
 	</licenses>
 
 	<scm>
-		<url>http://reflectasm.googlecode.com/svn/</url>
-		<connection>scm:svn:http://reflectasm.googlecode.com/svn/</connection>
+		<url>https://github.com/EsotericSoftware/reflectasm</url>
+		<connection>scm:git:https://github.com/EsotericSoftware/reflectasm.git</connection>
+		<developerConnection>scm:git:https://github.com/EsotericSoftware/reflectasm.git</developerConnection>
 	</scm>
 
 	<developers>
