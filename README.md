@@ -16,6 +16,18 @@ ReflectASM is a very small Java library that provides high performance reflectio
 
 The source code for these benchmarks is included in the project. The above charts were generated on Oracle's Java 7u3, server VM.
 
+## Installation
+
+To use reflectasm with maven, please use the following snippet in your pom.xml
+
+```xml
+    <dependency>
+        <groupId>com.esotericsoftware</groupId>
+        <artifactId>reflectasm</artifactId>
+        <version>1.10.0</version>
+    </dependency>
+```
+
 ## Usage
 
 Method reflection with ReflectASM:
