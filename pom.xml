@@ -26,8 +26,8 @@
 
 	<scm>
 		<url>https://github.com/EsotericSoftware/reflectasm</url>
-		<connection>scm:git:https://github.com/EsotericSoftware/reflectasm.git</connection>
-		<developerConnection>scm:git:https://github.com/EsotericSoftware/reflectasm.git</developerConnection>
+		<connection>scm:git:git@github.com:EsotericSoftware/reflectasm.git</connection>
+		<developerConnection>scm:git:git@github.com:EsotericSoftware/reflectasm.git</developerConnection>
 	</scm>
 
 	<developers>
