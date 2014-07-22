@@ -28,6 +28,23 @@ To use reflectasm with maven, please use the following snippet in your pom.xml
     </dependency>
 ```
 
+If you already have asm in a different version (than the one pulled in by reflectasm - see pom.xml) in your classpath, you should use the shaded reflectasm (contains relocated asm classes):
+
+```xml
+<dependency>
+  <groupId>com.esotericsoftware</groupId>
+  <artifactId>reflectasm</artifactId>
+  <version>1.10.0</version>
+  <classifier>shaded</classifier>
+  <exclusions>
+    <exclusion>
+      <groupId>org.ow2.asm</groupId>
+      <artifactId>asm</artifactId>
+    </exclusion>
+  </exclusions>
+</dependency>
+```
+
 ## Usage
 
 Method reflection with ReflectASM:
