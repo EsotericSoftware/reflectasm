@@ -33,14 +33,23 @@ public abstract class ConstructorAccess<T> {
 	 * <p>
 	 * If the underlying class is a inner (non-static nested) class, a new instance will be created using <code>null</code> as the
 	 * this$0 synthetic reference. The instantiated object will work as long as it actually don't use any member variable or method
-	 * fron the enclosing instance. */
+	 * from the enclosing instance.
+	 * @return a new Instance. */
 	abstract public T newInstance ();
 
 	/** Constructor for inner classes (non-static nested classes).
 	 * @param enclosingInstance The instance of the enclosing type to which this inner instance is related to (assigned to its
-	 *           synthetic this$0 field). */
+	 *           synthetic this$0 field).
+	 * @return a new Instance. */
 	abstract public T newInstance (Object enclosingInstance);
 
+	/**
+	 * Get a ConstructorAccess object for the supplied Class.
+	 * @param type the Class to construct the ConstructorAccess for.
+	 * @param <T> the generic Type.
+	 * @return the created ConstructorAccess.
+	 * @throws RuntimeException on problems accessing member classes or on missing/inaccessible no-argument constructor and any
+	 * 			other visibility issues. */
 	static public <T> ConstructorAccess<T> get (Class<T> type) {
 		Class enclosingType = type.getEnclosingClass();
 		boolean isNonStaticMemberClass = enclosingType != null && type.isMemberClass() && !Modifier.isStatic(type.getModifiers());

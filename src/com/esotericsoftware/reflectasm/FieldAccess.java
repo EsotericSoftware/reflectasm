@@ -25,6 +25,9 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 
+/**
+ * Used to access a field.
+ */
 public abstract class FieldAccess {
 	private String[] fieldNames;
 	private Class[] fieldTypes;

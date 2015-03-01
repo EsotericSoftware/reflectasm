@@ -27,6 +27,9 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
+/**
+ * Represents MethodAccess.
+ */
 public abstract class MethodAccess {
 	private String[] methodNames;
 	private Class[][] parameterTypes;
@@ -34,49 +37,79 @@ public abstract class MethodAccess {
 
 	abstract public Object invoke (Object object, int methodIndex, Object... args);
 
-	/** Invokes the method with the specified name and the specified param types. */
+	/** Invokes the method with the specified name and the specified param types.
+	 * @param object the object to use in invocation.
+	 * @param methodName the name of the method.
+	 * @param paramTypes the parameterTypes as Class[].
+	 * @param args any number of parameters to use.
+	 * @return the result. */
 	public Object invoke (Object object, String methodName, Class[] paramTypes, Object... args) {
 		return invoke(object, getIndex(methodName, paramTypes), args);
 	}
 
-	/** Invokes the first method with the specified name and the specified number of arguments. */
+	/** Invokes the first method with the specified name and the specified number of arguments.
+	 * @param object the object to use in invocation.
+	 * @param methodName the name of the method.
+	 * @param args any number of parameters to use.
+	 * @return the result. */
 	public Object invoke (Object object, String methodName, Object... args) {
 		return invoke(object, getIndex(methodName, args == null ? 0 : args.length), args);
 	}
 
-	/** Returns the index of the first method with the specified name. */
+	/** Returns the index of the first method with the specified name.
+	 * @param methodName the name of the method.
+	 * @return the index. */
 	public int getIndex (String methodName) {
 		for (int i = 0, n = methodNames.length; i < n; i++)
 			if (methodNames[i].equals(methodName)) return i;
 		throw new IllegalArgumentException("Unable to find non-private method: " + methodName);
 	}
 
-	/** Returns the index of the first method with the specified name and param types. */
+	/** Returns the index of the first method with the specified name and param types.
+	 * @param methodName the name of the method.
+	 * @param paramTypes the Classes of the method signature.
+	 * @return the index. */
 	public int getIndex (String methodName, Class... paramTypes) {
 		for (int i = 0, n = methodNames.length; i < n; i++)
 			if (methodNames[i].equals(methodName) && Arrays.equals(paramTypes, parameterTypes[i])) return i;
 		throw new IllegalArgumentException("Unable to find non-private method: " + methodName + " " + Arrays.toString(paramTypes));
 	}
 
-	/** Returns the index of the first method with the specified name and the specified number of arguments. */
+	/** Returns the index of the first method with the specified name and the specified number of arguments.
+	 * @param methodName the name of the method.
+	 * @param paramsCount the number of parameters.
+	 * @return the index. */
 	public int getIndex (String methodName, int paramsCount) {
 		for (int i = 0, n = methodNames.length; i < n; i++)
 			if (methodNames[i].equals(methodName) && parameterTypes[i].length == paramsCount) return i;
 		throw new IllegalArgumentException("Unable to find non-private method: " + methodName + " with " + paramsCount + " params.");
 	}
 
+	/**
+	 * All method names.
+	 * @return the method names as String[]. */
 	public String[] getMethodNames () {
 		return methodNames;
 	}
 
+	/**
+	 * All parameter types.
+	 * @return all parameter types as Class[][]. */
 	public Class[][] getParameterTypes () {
 		return parameterTypes;
 	}
 
+	/**
+	 * All return types.
+	 * @return the return types as Class[]. */
 	public Class[] getReturnTypes () {
 		return returnTypes;
 	}
 
+	/**
+	 * Retrieve a MethodAccess object by Class.
+	 * @param type the Class.
+	 * @return the MethodAccess object. */
 	static public MethodAccess get (Class type) {
 		ArrayList<Method> methods = new ArrayList<Method>();
 		boolean isInterface = type.isInterface();
