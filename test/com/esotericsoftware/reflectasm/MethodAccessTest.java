@@ -50,6 +50,9 @@ public class MethodAccessTest extends TestCase {
 		int index = access.getIndex("methodWithManyArguments", int.class, float.class, Integer.class, Float.class, SomeClass.class,
 			SomeClass.class, SomeClass.class);
 		assertEquals(access.getIndex("methodWithManyArguments"), index);
+
+		value = access.invoke(null, "staticMethod", "moo", 1234);
+		assertEquals("meow! moo, 1234", value);
 	}
 
 	public void testEmptyClass () {
@@ -94,7 +97,7 @@ public class MethodAccessTest extends TestCase {
 		Object value;
 
 		// invoke a method declared directly in the ConcurrentMap interface
-		value = access.invoke(someMap, "replace", "first", "foo"); 
+		value = access.invoke(someMap, "replace", "first", "foo");
 		assertEquals("one", value);
 		// invoke a method declared in the Map superinterface
 		value = access.invoke(someMap, "size");
@@ -127,6 +130,9 @@ public class MethodAccessTest extends TestCase {
 		public String methodWithManyArguments (int i, float f, Integer I, Float F, SomeClass c, SomeClass c1, SomeClass c2) {
 			return "test";
 		}
+
+		static public String staticMethod (String a, int b) {
+			return "meow! " + a + ", " + b;
+		}
 	}
-	
 }

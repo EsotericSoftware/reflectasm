@@ -156,7 +156,6 @@ public abstract class MethodAccess {
 							buffer.setLength(0);
 							buffer.append('(');
 
-							String methodName = methodNames[i];
 							Class[] paramTypes = parameterTypes[i];
 							Class returnType = returnTypes[i];
 							for (int paramIndex = 0; paramIndex < paramTypes.length; paramIndex++) {
@@ -209,8 +208,14 @@ public abstract class MethodAccess {
 
 							buffer.append(')');
 							buffer.append(Type.getDescriptor(returnType));
-							mv.visitMethodInsn(isInterface ? INVOKEINTERFACE : INVOKEVIRTUAL, classNameInternal, methodName,
-								buffer.toString());
+							int invoke;
+							if (isInterface)
+								invoke = INVOKEINTERFACE;
+							else if (Modifier.isStatic(methods.get(i).getModifiers()))
+								invoke = INVOKESTATIC;
+							else
+								invoke = INVOKEVIRTUAL;
+							mv.visitMethodInsn(invoke, classNameInternal, methodNames[i], buffer.toString());
 
 							switch (Type.getType(returnType).getSort()) {
 							case Type.VOID:
@@ -283,7 +288,7 @@ public abstract class MethodAccess {
 		for (int i = 0, n = declaredMethods.length; i < n; i++) {
 			Method method = declaredMethods[i];
 			int modifiers = method.getModifiers();
-			if (Modifier.isStatic(modifiers)) continue;
+			// if (Modifier.isStatic(modifiers)) continue;
 			if (Modifier.isPrivate(modifiers)) continue;
 			methods.add(method);
 		}
