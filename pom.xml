@@ -7,7 +7,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.esotericsoftware</groupId>
 	<artifactId>reflectasm</artifactId>
-	<version>1.10.1-SNAPSHOT</version>
+	<version>1.10.2-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 	<name>ReflectASM</name>
 	<description>High performance Java reflection using code generation</description>
@@ -43,7 +43,7 @@
 		<dependency>
 			<groupId>org.ow2.asm</groupId>
 			<artifactId>asm</artifactId>
-			<version>4.2</version>
+			<version>5.0.3</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
