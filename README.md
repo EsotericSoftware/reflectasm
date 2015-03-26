@@ -24,7 +24,7 @@ To use reflectasm with maven, please use the following snippet in your pom.xml
     <dependency>
         <groupId>com.esotericsoftware</groupId>
         <artifactId>reflectasm</artifactId>
-        <version>1.10.1</version>
+        <version>1.11.0</version>
     </dependency>
 ```
 
@@ -34,7 +34,7 @@ If you already have asm in a different version (than the one pulled in by reflec
 <dependency>
   <groupId>com.esotericsoftware</groupId>
   <artifactId>reflectasm</artifactId>
-  <version>1.10.1</version>
+  <version>1.11.0</version>
   <classifier>shaded</classifier>
   <exclusions>
     <exclusion>
