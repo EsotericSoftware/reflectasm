@@ -26,6 +26,8 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 
 public abstract class FieldAccess {
+	private static final Object theUnsafe;
+	
 	private String[] fieldNames;
 	private Class[] fieldTypes;
 
@@ -572,5 +574,25 @@ public abstract class FieldAccess {
 		mv.visitInsn(ATHROW);
 		return mv;
 	}
-
+	
+	static public  FieldAccess getAccessUnsafe(Class<?> type)
+	{
+		if(theUnsafe == null)
+			throw new UnsupportedOperationException();
+		
+		return new FieldAccessUnsafe(type, (sun.misc.Unsafe)theUnsafe);
+	}
+	
+	static {
+		Object unsafe = null;
+		try {
+			Class<?> clazz = Class.forName("sun.misc.Unsafe");
+			Field field = clazz.getDeclaredField("theUnsafe");
+			field.setAccessible(true);
+			unsafe = field.get(null);
+		} catch (Exception e) {
+		} finally {
+			theUnsafe = unsafe;
+		}
+	}
 }
