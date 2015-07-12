@@ -28,8 +28,8 @@ import org.objectweb.asm.Type;
 public abstract class FieldAccess {
 	private static final Object theUnsafe;
 	
-	private String[] fieldNames;
-	private Class[] fieldTypes;
+	protected String[] fieldNames;
+	protected Class[] fieldTypes;
 
 	public int getIndex (String fieldName) {
 		for (int i = 0, n = fieldNames.length; i < n; i++)
