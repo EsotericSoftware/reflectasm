@@ -49,55 +49,59 @@ public abstract class ConstructorAccess<T> {
 		String accessClassName = className + "ConstructorAccess";
 		if (accessClassName.startsWith("java.")) accessClassName = "reflectasm." + accessClassName;
 		Class accessClass;
-		
+
 		AccessClassLoader loader = AccessClassLoader.get(type);
-		synchronized (loader) {
-			try {
-				accessClass = loader.loadClass(accessClassName);
-			} catch (ClassNotFoundException ignored) {
-				String accessClassNameInternal = accessClassName.replace('.', '/');
-				String classNameInternal = className.replace('.', '/');
-				String enclosingClassNameInternal;
-				Constructor<T> constructor = null;
-				int modifiers = 0;
-				if (!isNonStaticMemberClass) {
-					enclosingClassNameInternal = null;
-					try {
-						constructor = type.getDeclaredConstructor((Class[])null);
-						modifiers = constructor.getModifiers();
-					} catch (Exception ex) {
-						throw new RuntimeException("Class cannot be created (missing no-arg constructor): " + type.getName(), ex);
+		try {
+			accessClass = loader.loadClass(accessClassName);
+		} catch (ClassNotFoundException ignored) {
+			synchronized (loader) {
+				try {
+					accessClass = loader.loadClass(accessClassName);
+				} catch (ClassNotFoundException ignored2) {
+					String accessClassNameInternal = accessClassName.replace('.', '/');
+					String classNameInternal = className.replace('.', '/');
+					String enclosingClassNameInternal;
+					Constructor<T> constructor = null;
+					int modifiers = 0;
+					if (!isNonStaticMemberClass) {
+						enclosingClassNameInternal = null;
+						try {
+							constructor = type.getDeclaredConstructor((Class[])null);
+							modifiers = constructor.getModifiers();
+						} catch (Exception ex) {
+							throw new RuntimeException("Class cannot be created (missing no-arg constructor): " + type.getName(), ex);
+						}
+						if (Modifier.isPrivate(modifiers)) {
+							throw new RuntimeException("Class cannot be created (the no-arg constructor is private): " + type.getName());
+						}
+					} else {
+						enclosingClassNameInternal = enclosingType.getName().replace('.', '/');
+						try {
+							constructor = type.getDeclaredConstructor(enclosingType); // Inner classes should have this.
+							modifiers = constructor.getModifiers();
+						} catch (Exception ex) {
+							throw new RuntimeException("Non-static member class cannot be created (missing enclosing class constructor): "
+								+ type.getName(), ex);
+						}
+						if (Modifier.isPrivate(modifiers)) {
+							throw new RuntimeException(
+								"Non-static member class cannot be created (the enclosing class constructor is private): " + type.getName());
+						}
 					}
-					if (Modifier.isPrivate(modifiers)) {
-						throw new RuntimeException("Class cannot be created (the no-arg constructor is private): " + type.getName());
-					}
-				} else {
-					enclosingClassNameInternal = enclosingType.getName().replace('.', '/');
-					try {
-						constructor = type.getDeclaredConstructor(enclosingType); // Inner classes should have this.
-						modifiers = constructor.getModifiers();
-					} catch (Exception ex) {
-						throw new RuntimeException("Non-static member class cannot be created (missing enclosing class constructor): "
-							+ type.getName(), ex);
-					}
-					if (Modifier.isPrivate(modifiers)) {
-						throw new RuntimeException(
-							"Non-static member class cannot be created (the enclosing class constructor is private): " + type.getName());
-					}
+					String superclassNameInternal = Modifier.isPublic(modifiers) ?
+													"com/esotericsoftware/reflectasm/PublicConstructorAccess" :
+													"com/esotericsoftware/reflectasm/ConstructorAccess";
+
+					ClassWriter cw = new ClassWriter(0);
+					cw.visit(V1_1, ACC_PUBLIC + ACC_SUPER, accessClassNameInternal, null, superclassNameInternal, null);
+
+					insertConstructor(cw, superclassNameInternal);
+					insertNewInstance(cw, classNameInternal);
+					insertNewInstanceInner(cw, classNameInternal, enclosingClassNameInternal);
+
+					cw.visitEnd();
+					accessClass = loader.defineClass(accessClassName, cw.toByteArray());
 				}
-				String superclassNameInternal = Modifier.isPublic(modifiers) ?
-												"com/esotericsoftware/reflectasm/PublicConstructorAccess" :
-												"com/esotericsoftware/reflectasm/ConstructorAccess";
-
-				ClassWriter cw = new ClassWriter(0);
-				cw.visit(V1_1, ACC_PUBLIC + ACC_SUPER, accessClassNameInternal, null, superclassNameInternal, null);
-
-				insertConstructor(cw, superclassNameInternal);
-				insertNewInstance(cw, classNameInternal);
-				insertNewInstanceInner(cw, classNameInternal, enclosingClassNameInternal);
-
-				cw.visitEnd();
-				accessClass = loader.defineClass(accessClassName, cw.toByteArray());
 			}
 		}
 		ConstructorAccess<T> access;
