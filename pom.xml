@@ -7,7 +7,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.esotericsoftware</groupId>
 	<artifactId>reflectasm</artifactId>
-	<version>1.11.3</version>
+	<version>1.11.4-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 	<name>ReflectASM</name>
 	<description>High performance Java reflection using code generation</description>
