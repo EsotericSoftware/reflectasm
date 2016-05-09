@@ -82,7 +82,7 @@ class AccessClassLoader extends ClassLoader {
 		super(parent);
 	}
 
-	protected synchronized java.lang.Class<?> loadClass (String name, boolean resolve) throws ClassNotFoundException {
+	protected java.lang.Class<?> loadClass (String name, boolean resolve) throws ClassNotFoundException {
 		// These classes come from the classloader that loaded AccessClassLoader.
 		if (name.equals(FieldAccess.class.getName())) return FieldAccess.class;
 		if (name.equals(MethodAccess.class.getName())) return MethodAccess.class;
