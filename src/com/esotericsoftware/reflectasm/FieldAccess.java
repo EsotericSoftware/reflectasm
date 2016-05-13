@@ -7,7 +7,7 @@
  *  1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
  *  2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
  *  3. Neither the name of Esoteric Software nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
@@ -26,8 +26,10 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 
 public abstract class FieldAccess {
-	private String[] fieldNames;
-	private Class[] fieldTypes;
+	private static final Object theUnsafe;
+	
+	protected String[] fieldNames;
+	protected Class[] fieldTypes;
 
 	public int getIndex (String fieldName) {
 		for (int i = 0, n = fieldNames.length; i < n; i++)
@@ -576,5 +578,25 @@ public abstract class FieldAccess {
 		mv.visitInsn(ATHROW);
 		return mv;
 	}
-
+	
+	static public  FieldAccess getAccessUnsafe(Class<?> type)
+	{
+		if(theUnsafe == null)
+			throw new UnsupportedOperationException();
+		
+		return new FieldAccessUnsafe(type, (sun.misc.Unsafe)theUnsafe);
+	}
+	
+	static {
+		Object unsafe = null;
+		try {
+			Class<?> clazz = Class.forName("sun.misc.Unsafe");
+			Field field = clazz.getDeclaredField("theUnsafe");
+			field.setAccessible(true);
+			unsafe = field.get(null);
+		} catch (Exception e) {
+		} finally {
+			theUnsafe = unsafe;
+		}
+	}
 }
