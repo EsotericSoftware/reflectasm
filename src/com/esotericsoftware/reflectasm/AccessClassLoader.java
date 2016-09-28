@@ -17,6 +17,7 @@ package com.esotericsoftware.reflectasm;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 import java.security.ProtectionDomain;
+import java.util.HashSet;
 import java.util.WeakHashMap;
 
 class AccessClassLoader extends ClassLoader {
@@ -82,6 +83,19 @@ class AccessClassLoader extends ClassLoader {
 		super(parent);
 	}
 
+        HashSet<String> locals = new HashSet<String>();
+	java.lang.Class<?> loadClassLocal(String name) throws ClassNotFoundException {
+            if (locals.contains(name))
+                return loadClass(name,false);
+            else
+                throw new ClassNotFoundException();
+        }
+	Class<?> defineClassLocal(String name, byte[] bytes) throws ClassFormatError {
+            locals.add(name);
+            return defineClass(name,bytes);
+        }
+        
+        
 	protected java.lang.Class<?> loadClass (String name, boolean resolve) throws ClassNotFoundException {
 		// These classes come from the classloader that loaded AccessClassLoader.
 		if (name.equals(FieldAccess.class.getName())) return FieldAccess.class;

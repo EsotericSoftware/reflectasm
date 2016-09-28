@@ -137,11 +137,11 @@ public abstract class FieldAccess {
 
 		AccessClassLoader loader = AccessClassLoader.get(type);
 		try {
-			accessClass = loader.loadClass(accessClassName);
+			accessClass = loader.loadClassLocal(accessClassName);
 		} catch (ClassNotFoundException ignored) {
 			synchronized (loader) {
 				try {
-					accessClass = loader.loadClass(accessClassName);
+					accessClass = loader.loadClassLocal(accessClassName);
 				} catch (ClassNotFoundException ignored2) {
 					String accessClassNameInternal = accessClassName.replace('.', '/');
 					String classNameInternal = className.replace('.', '/');
@@ -170,7 +170,7 @@ public abstract class FieldAccess {
 					insertSetPrimitive(cw, classNameInternal, fields, Type.CHAR_TYPE);
 					insertGetString(cw, classNameInternal, fields);
 					cw.visitEnd();
-					accessClass = loader.defineClass(accessClassName, cw.toByteArray());
+					accessClass = loader.defineClassLocal(accessClassName, cw.toByteArray());
 				}
 			}
 		}

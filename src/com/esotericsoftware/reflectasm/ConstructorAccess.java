@@ -52,11 +52,11 @@ public abstract class ConstructorAccess<T> {
 
 		AccessClassLoader loader = AccessClassLoader.get(type);
 		try {
-			accessClass = loader.loadClass(accessClassName);
+			accessClass = loader.loadClassLocal(accessClassName);
 		} catch (ClassNotFoundException ignored) {
 			synchronized (loader) {
 				try {
-					accessClass = loader.loadClass(accessClassName);
+					accessClass = loader.loadClassLocal(accessClassName);
 				} catch (ClassNotFoundException ignored2) {
 					String accessClassNameInternal = accessClassName.replace('.', '/');
 					String classNameInternal = className.replace('.', '/');
@@ -100,7 +100,7 @@ public abstract class ConstructorAccess<T> {
 					insertNewInstanceInner(cw, classNameInternal, enclosingClassNameInternal);
 
 					cw.visitEnd();
-					accessClass = loader.defineClass(accessClassName, cw.toByteArray());
+					accessClass = loader.defineClassLocal(accessClassName, cw.toByteArray());
 				}
 			}
 		}
