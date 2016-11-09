@@ -28,11 +28,18 @@ import org.objectweb.asm.Type;
 public abstract class FieldAccess {
 	private String[] fieldNames;
 	private Class[] fieldTypes;
+	private Field[] fields;
 
 	public int getIndex (String fieldName) {
 		for (int i = 0, n = fieldNames.length; i < n; i++)
 			if (fieldNames[i].equals(fieldName)) return i;
 		throw new IllegalArgumentException("Unable to find non-private field: " + fieldName);
+	}
+
+	public int getIndex (Field field) {
+		for (int i = 0, n = fields.length; i < n; i++)
+			if (fields[i].equals(field)) return i;
+		throw new IllegalArgumentException("Unable to find non-private field: " + field);
 	}
 
 	public void set (Object instance, String fieldName, Object value) {
@@ -53,6 +60,14 @@ public abstract class FieldAccess {
 
 	public int getFieldCount () {
 		return fieldTypes.length;
+	}
+
+	public Field[] getFields () {
+		return fields;
+	}
+
+	public void setFields (Field[] fields) {
+		this.fields = fields;
 	}
 
 	abstract public void set (Object instance, int fieldIndex, Object value);
@@ -130,10 +145,10 @@ public abstract class FieldAccess {
 				} catch (ClassNotFoundException ignored2) {
 					String accessClassNameInternal = accessClassName.replace('.', '/');
 					String classNameInternal = className.replace('.', '/');
-	
+
 					ClassWriter cw = new ClassWriter(0);
-					cw.visit(V1_1, ACC_PUBLIC + ACC_SUPER, accessClassNameInternal, null, "com/esotericsoftware/reflectasm/FieldAccess",
-						null);
+					cw.visit(V1_1, ACC_PUBLIC + ACC_SUPER, accessClassNameInternal, null,
+						"com/esotericsoftware/reflectasm/FieldAccess", null);
 					insertConstructor(cw);
 					insertGetObject(cw, classNameInternal, fields);
 					insertSetObject(cw, classNameInternal, fields);
@@ -163,6 +178,7 @@ public abstract class FieldAccess {
 			FieldAccess access = (FieldAccess)accessClass.newInstance();
 			access.fieldNames = fieldNames;
 			access.fieldTypes = fieldTypes;
+			access.fields = fields.toArray(new Field[fields.size()]);
 			return access;
 		} catch (Throwable t) {
 			throw new RuntimeException("Error constructing field access class: " + accessClassName, t);
@@ -365,7 +381,8 @@ public abstract class FieldAccess {
 		mv.visitEnd();
 	}
 
-	static private void insertSetPrimitive (ClassWriter cw, String classNameInternal, ArrayList<Field> fields, Type primitiveType) {
+	static private void insertSetPrimitive (ClassWriter cw, String classNameInternal, ArrayList<Field> fields,
+		Type primitiveType) {
 		int maxStack = 6;
 		int maxLocals = 4; // See correction below for LLOAD and DLOAD
 		final String setterMethodName;
@@ -458,7 +475,8 @@ public abstract class FieldAccess {
 		mv.visitEnd();
 	}
 
-	static private void insertGetPrimitive (ClassWriter cw, String classNameInternal, ArrayList<Field> fields, Type primitiveType) {
+	static private void insertGetPrimitive (ClassWriter cw, String classNameInternal, ArrayList<Field> fields,
+		Type primitiveType) {
 		int maxStack = 6;
 		final String getterMethodName;
 		final String typeNameInternal = primitiveType.getDescriptor();
