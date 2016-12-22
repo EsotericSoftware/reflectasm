@@ -5,13 +5,13 @@
 		<version>7</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.esotericsoftware</groupId>
+	<groupId>org.db4j</groupId>
 	<artifactId>reflectasm</artifactId>
 	<version>1.11.5-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 	<name>ReflectASM</name>
 	<description>High performance Java reflection using code generation</description>
-	<url>https://github.com/EsotericSoftware/reflectasm</url>
+	<url>https://github.com/nqzero/reflectasm</url>
 
 	<licenses>
 		<license>
@@ -23,8 +23,8 @@
 
 	<scm>
 		<url>https://github.com/EsotericSoftware/reflectasm</url>
-		<connection>scm:git:git@github.com:EsotericSoftware/reflectasm.git</connection>
-		<developerConnection>scm:git:git@github.com:EsotericSoftware/reflectasm.git</developerConnection>
+		<connection>scm:git:git@github.com:nqzero/reflectasm.git</connection>
+		<developerConnection>scm:git:git@github.com:nqzero/reflectasm.git</developerConnection>
 	</scm>
 
 	<developers>
@@ -33,6 +33,12 @@
 			<name>Nathan Sweet</name>
 			<email>nathan.sweet@gmail.com</email>
 		</developer>
+                <developer>
+                    <name>nqzero</name>
+                    <email>srl.public@nqzero.com</email>
+                    <organization>nqzero</organization>
+                    <organizationUrl>https://github.com/nqzero</organizationUrl>
+                </developer>
 	</developers>
 
 	<properties>
