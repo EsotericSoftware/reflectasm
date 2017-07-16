@@ -260,7 +260,8 @@ public abstract class FieldAccess {
 					break;
 				}
 
-				mv.visitFieldInsn(PUTFIELD, classNameInternal, field.getName(), fieldType.getDescriptor());
+				mv.visitFieldInsn(PUTFIELD, field.getDeclaringClass().getName().replace('.', '/'), field.getName(),
+					fieldType.getDescriptor());
 				mv.visitInsn(RETURN);
 			}
 
@@ -293,7 +294,8 @@ public abstract class FieldAccess {
 				mv.visitFrame(F_SAME, 0, null, 0, null);
 				mv.visitVarInsn(ALOAD, 1);
 				mv.visitTypeInsn(CHECKCAST, classNameInternal);
-				mv.visitFieldInsn(GETFIELD, classNameInternal, field.getName(), Type.getDescriptor(field.getType()));
+				mv.visitFieldInsn(GETFIELD, field.getDeclaringClass().getName().replace('.', '/'), field.getName(),
+					Type.getDescriptor(field.getType()));
 
 				Type fieldType = Type.getType(field.getType());
 				switch (fieldType.getSort()) {
@@ -358,11 +360,13 @@ public abstract class FieldAccess {
 
 			for (int i = 0, n = labels.length; i < n; i++) {
 				if (!labels[i].equals(labelForInvalidTypes)) {
+					Field field = fields.get(i);
 					mv.visitLabel(labels[i]);
 					mv.visitFrame(F_SAME, 0, null, 0, null);
 					mv.visitVarInsn(ALOAD, 1);
 					mv.visitTypeInsn(CHECKCAST, classNameInternal);
-					mv.visitFieldInsn(GETFIELD, classNameInternal, fields.get(i).getName(), "Ljava/lang/String;");
+					mv.visitFieldInsn(GETFIELD, field.getDeclaringClass().getName().replace('.', '/'), field.getName(),
+						"Ljava/lang/String;");
 					mv.visitInsn(ARETURN);
 				}
 			}
@@ -451,12 +455,14 @@ public abstract class FieldAccess {
 
 			for (int i = 0, n = labels.length; i < n; i++) {
 				if (!labels[i].equals(labelForInvalidTypes)) {
+					Field field = fields.get(i);
 					mv.visitLabel(labels[i]);
 					mv.visitFrame(F_SAME, 0, null, 0, null);
 					mv.visitVarInsn(ALOAD, 1);
 					mv.visitTypeInsn(CHECKCAST, classNameInternal);
 					mv.visitVarInsn(loadValueInstruction, 3);
-					mv.visitFieldInsn(PUTFIELD, classNameInternal, fields.get(i).getName(), typeNameInternal);
+					mv.visitFieldInsn(PUTFIELD, field.getDeclaringClass().getName().replace('.', '/'), field.getName(),
+						typeNameInternal);
 					mv.visitInsn(RETURN);
 				}
 			}
@@ -546,7 +552,8 @@ public abstract class FieldAccess {
 					mv.visitFrame(F_SAME, 0, null, 0, null);
 					mv.visitVarInsn(ALOAD, 1);
 					mv.visitTypeInsn(CHECKCAST, classNameInternal);
-					mv.visitFieldInsn(GETFIELD, classNameInternal, field.getName(), typeNameInternal);
+					mv.visitFieldInsn(GETFIELD, field.getDeclaringClass().getName().replace('.', '/'), field.getName(),
+						typeNameInternal);
 					mv.visitInsn(returnValueInstruction);
 				}
 			}
