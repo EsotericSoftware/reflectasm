@@ -1,4 +1,8 @@
-version: 1.11.4
+version: 1.11.5
 ---
+classpath build/jarjar-command-1.0.0-all.jar;
+com.tonicsystems.jarjar.Main.main(new String[] {
+	"-rules", "build/jarjar.rules", "build/asm-5.1.jar", "-output", "lib/asm-5.1-es.jar"
+});
 Build.build(project);
 Build.oneJAR(project);

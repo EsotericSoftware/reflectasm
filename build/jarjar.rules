@@ -1,0 +1,1 @@
+rule org.objectweb.asm.** com.esotericsoftware.asm.@1

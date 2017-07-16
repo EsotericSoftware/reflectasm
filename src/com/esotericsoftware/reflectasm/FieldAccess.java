@@ -14,16 +14,16 @@
 
 package com.esotericsoftware.reflectasm;
 
-import static org.objectweb.asm.Opcodes.*;
+import static com.esotericsoftware.asm.Opcodes.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Type;
+import com.esotericsoftware.asm.ClassWriter;
+import com.esotericsoftware.asm.Label;
+import com.esotericsoftware.asm.MethodVisitor;
+import com.esotericsoftware.asm.Type;
 
 public abstract class FieldAccess {
 	private String[] fieldNames;
