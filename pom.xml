@@ -106,8 +106,7 @@
 						<configuration>
 							<!-- remove all classes of dependencies that are not used by the project -->
 							<minimizeJar>true</minimizeJar>
-							<shadedArtifactAttached>true</shadedArtifactAttached>
-							<shadedClassifierName>shaded</shadedClassifierName>
+							<shadedArtifactAttached>false</shadedArtifactAttached>
 							<relocations>
 								<relocation>
 									<pattern>org.objectweb.asm</pattern>
