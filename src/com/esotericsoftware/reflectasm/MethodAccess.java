@@ -14,18 +14,18 @@
 
 package com.esotericsoftware.reflectasm;
 
-import static com.esotericsoftware.asm.Opcodes.*;
+import static org.objectweb.asm.Opcodes.*;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import com.esotericsoftware.asm.ClassWriter;
-import com.esotericsoftware.asm.Label;
-import com.esotericsoftware.asm.MethodVisitor;
-import com.esotericsoftware.asm.Opcodes;
-import com.esotericsoftware.asm.Type;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 
 public abstract class MethodAccess {
 	private String[] methodNames;
