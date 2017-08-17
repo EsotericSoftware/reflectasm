@@ -108,7 +108,11 @@ public abstract class FieldAccess {
 
 	abstract public float getFloat (Object instance, int fieldIndex);
 
+	/** @param type Must not be the Object class, an interface, a primitive type, or void. */
 	static public FieldAccess get (Class type) {
+		if (type.getSuperclass() == null)
+			throw new IllegalArgumentException("The type must not be the Object class, an interface, a primitive type, or void.");
+
 		ArrayList<Field> fields = new ArrayList<Field>();
 		Class nextClass = type;
 		while (nextClass != Object.class) {
@@ -424,8 +428,8 @@ public abstract class FieldAccess {
 			break;
 		case Type.DOUBLE:
 			setterMethodName = "setDouble";
-			loadValueInstruction = DLOAD; // (LLOAD and DLOAD actually load two slots)
-			maxLocals++;
+			loadValueInstruction = DLOAD;
+			maxLocals++; // (LLOAD and DLOAD actually load two slots)
 			break;
 		default:
 			setterMethodName = "set";
