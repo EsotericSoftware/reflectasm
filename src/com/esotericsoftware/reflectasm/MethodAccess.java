@@ -113,11 +113,11 @@ public abstract class MethodAccess {
 
 		AccessClassLoader loader = AccessClassLoader.get(type);
 		try {
-			accessClass = loader.loadClass(accessClassName);
+			accessClass = loader.loadClassLocal(accessClassName);
 		} catch (ClassNotFoundException ignored) {
 			synchronized (loader) {
 				try {
-					accessClass = loader.loadClass(accessClassName);
+					accessClass = loader.loadClassLocal(accessClassName);
 				} catch (ClassNotFoundException ignored2) {
 					String accessClassNameInternal = accessClassName.replace('.', '/');
 					String classNameInternal = className.replace('.', '/');
@@ -277,7 +277,7 @@ public abstract class MethodAccess {
 					}
 					cw.visitEnd();
 					byte[] data = cw.toByteArray();
-					accessClass = loader.defineClass(accessClassName, data);
+					accessClass = loader.defineClassLocal(accessClassName, data);
 				}
 			}
 		}
