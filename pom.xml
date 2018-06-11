@@ -7,7 +7,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.esotericsoftware</groupId>
 	<artifactId>reflectasm</artifactId>
-	<version>1.11.6-SNAPSHOT</version>
+	<version>1.11.5-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 	<name>ReflectASM</name>
 	<description>High performance Java reflection using code generation</description>
@@ -106,8 +106,7 @@
 						<configuration>
 							<!-- remove all classes of dependencies that are not used by the project -->
 							<minimizeJar>true</minimizeJar>
-							<shadedArtifactAttached>true</shadedArtifactAttached>
-							<shadedClassifierName>shaded</shadedClassifierName>
+							<shadedArtifactAttached>false</shadedArtifactAttached>
 							<relocations>
 								<relocation>
 									<pattern>org.objectweb.asm</pattern>

@@ -14,13 +14,13 @@
 
 package com.esotericsoftware.reflectasm;
 
-import static com.esotericsoftware.asm.Opcodes.*;
-
-import com.esotericsoftware.asm.ClassWriter;
-import com.esotericsoftware.asm.MethodVisitor;
+import static org.objectweb.asm.Opcodes.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
+
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.MethodVisitor;
 
 abstract public class ConstructorAccess<T> {
 	boolean isNonStaticMemberClass;
