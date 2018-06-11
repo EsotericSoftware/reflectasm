@@ -16,13 +16,13 @@ package com.esotericsoftware.reflectasm;
 
 import static com.esotericsoftware.asm.Opcodes.*;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Modifier;
-
 import com.esotericsoftware.asm.ClassWriter;
 import com.esotericsoftware.asm.MethodVisitor;
 
-public abstract class ConstructorAccess<T> {
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
+
+abstract public class ConstructorAccess<T> {
 	boolean isNonStaticMemberClass;
 
 	public boolean isNonStaticMemberClass () {
@@ -48,16 +48,13 @@ public abstract class ConstructorAccess<T> {
 		String className = type.getName();
 		String accessClassName = className + "ConstructorAccess";
 		if (accessClassName.startsWith("java.")) accessClassName = "reflectasm." + accessClassName;
-		Class accessClass;
 
 		AccessClassLoader loader = AccessClassLoader.get(type);
-		try {
-			accessClass = loader.loadClass(accessClassName);
-		} catch (ClassNotFoundException ignored) {
+		Class accessClass = loader.loadAccessClass(accessClassName);
+		if (accessClass == null) {
 			synchronized (loader) {
-				try {
-					accessClass = loader.loadClass(accessClassName);
-				} catch (ClassNotFoundException ignored2) {
+				accessClass = loader.loadAccessClass(accessClassName);
+				if (accessClass == null) {
 					String accessClassNameInternal = accessClassName.replace('.', '/');
 					String classNameInternal = className.replace('.', '/');
 					String enclosingClassNameInternal;
@@ -80,17 +77,18 @@ public abstract class ConstructorAccess<T> {
 							constructor = type.getDeclaredConstructor(enclosingType); // Inner classes should have this.
 							modifiers = constructor.getModifiers();
 						} catch (Exception ex) {
-							throw new RuntimeException("Non-static member class cannot be created (missing enclosing class constructor): "
-								+ type.getName(), ex);
+							throw new RuntimeException(
+								"Non-static member class cannot be created (missing enclosing class constructor): " + type.getName(), ex);
 						}
 						if (Modifier.isPrivate(modifiers)) {
 							throw new RuntimeException(
-								"Non-static member class cannot be created (the enclosing class constructor is private): " + type.getName());
+								"Non-static member class cannot be created (the enclosing class constructor is private): "
+									+ type.getName());
 						}
 					}
-					String superclassNameInternal = Modifier.isPublic(modifiers) ?
-													"com/esotericsoftware/reflectasm/PublicConstructorAccess" :
-													"com/esotericsoftware/reflectasm/ConstructorAccess";
+					String superclassNameInternal = Modifier.isPublic(modifiers)
+						? "com/esotericsoftware/reflectasm/PublicConstructorAccess"
+						: "com/esotericsoftware/reflectasm/ConstructorAccess";
 
 					ClassWriter cw = new ClassWriter(0);
 					cw.visit(V1_1, ACC_PUBLIC + ACC_SUPER, accessClassNameInternal, null, superclassNameInternal, null);
@@ -100,7 +98,7 @@ public abstract class ConstructorAccess<T> {
 					insertNewInstanceInner(cw, classNameInternal, enclosingClassNameInternal);
 
 					cw.visitEnd();
-					accessClass = loader.defineClass(accessClassName, cw.toByteArray());
+					accessClass = loader.defineAccessClass(accessClassName, cw.toByteArray());
 				}
 			}
 		}
@@ -110,14 +108,13 @@ public abstract class ConstructorAccess<T> {
 		} catch (Throwable t) {
 			throw new RuntimeException("Exception constructing constructor access class: " + accessClassName, t);
 		}
-		if (!(access instanceof PublicConstructorAccess)  && !AccessClassLoader.areInSameRuntimeClassLoader(type, accessClass)) {
+		if (!(access instanceof PublicConstructorAccess) && !AccessClassLoader.areInSameRuntimeClassLoader(type, accessClass)) {
 			// Must test this after the try-catch block, whether the class has been loaded as if has been defined.
 			// Throw a Runtime exception here instead of an IllegalAccessError when invoking newInstance()
-			throw new RuntimeException(
-					(!isNonStaticMemberClass ?
-					"Class cannot be created (the no-arg constructor is protected or package-protected, and its ConstructorAccess could not be defined in the same class loader): " :
-					"Non-static member class cannot be created (the enclosing class constructor is protected or package-protected, and its ConstructorAccess could not be defined in the same class loader): ")
-					+ type.getName());
+			throw new RuntimeException((!isNonStaticMemberClass
+				? "Class cannot be created (the no-arg constructor is protected or package-protected, and its ConstructorAccess could not be defined in the same class loader): "
+				: "Non-static member class cannot be created (the enclosing class constructor is protected or package-protected, and its ConstructorAccess could not be defined in the same class loader): ")
+				+ type.getName());
 		}
 		access.isNonStaticMemberClass = isNonStaticMemberClass;
 		return access;

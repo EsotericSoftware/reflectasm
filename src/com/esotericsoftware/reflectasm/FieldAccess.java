@@ -137,16 +137,13 @@ public abstract class FieldAccess {
 		String className = type.getName();
 		String accessClassName = className + "FieldAccess";
 		if (accessClassName.startsWith("java.")) accessClassName = "reflectasm." + accessClassName;
-		Class accessClass = null;
 
 		AccessClassLoader loader = AccessClassLoader.get(type);
-		try {
-			accessClass = loader.loadClass(accessClassName);
-		} catch (ClassNotFoundException ignored) {
+		Class accessClass = loader.loadAccessClass(accessClassName);
+		if (accessClass == null) {
 			synchronized (loader) {
-				try {
-					accessClass = loader.loadClass(accessClassName);
-				} catch (ClassNotFoundException ignored2) {
+				accessClass = loader.loadAccessClass(accessClassName);
+				if (accessClass == null) {
 					String accessClassNameInternal = accessClassName.replace('.', '/');
 					String classNameInternal = className.replace('.', '/');
 
@@ -174,7 +171,7 @@ public abstract class FieldAccess {
 					insertSetPrimitive(cw, classNameInternal, fields, Type.CHAR_TYPE);
 					insertGetString(cw, classNameInternal, fields);
 					cw.visitEnd();
-					accessClass = loader.defineClass(accessClassName, cw.toByteArray());
+					accessClass = loader.defineAccessClass(accessClassName, cw.toByteArray());
 				}
 			}
 		}
