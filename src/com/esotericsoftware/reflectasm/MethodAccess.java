@@ -62,7 +62,8 @@ public abstract class MethodAccess {
 	public int getIndex (String methodName, int paramsCount) {
 		for (int i = 0, n = methodNames.length; i < n; i++)
 			if (methodNames[i].equals(methodName) && parameterTypes[i].length == paramsCount) return i;
-		throw new IllegalArgumentException("Unable to find non-private method: " + methodName + " with " + paramsCount + " params.");
+		throw new IllegalArgumentException(
+			"Unable to find non-private method: " + methodName + " with " + paramsCount + " params.");
 	}
 
 	public String[] getMethodNames () {
@@ -77,18 +78,22 @@ public abstract class MethodAccess {
 		return returnTypes;
 	}
 
+	/** Creates a new MethodAccess for the specified type.
+	 * @param type Must not be the Object class, a primitive type, or void. */
 	static public MethodAccess get (Class type) {
-		ArrayList<Method> methods = new ArrayList<Method>();
 		boolean isInterface = type.isInterface();
+		if (!isInterface && type.getSuperclass() == null)
+			throw new IllegalArgumentException("The type must not be the Object class, an interface, a primitive type, or void.");
+
+		ArrayList<Method> methods = new ArrayList<Method>();
 		if (!isInterface) {
 			Class nextClass = type;
 			while (nextClass != Object.class) {
 				addDeclaredMethodsToList(nextClass, methods);
 				nextClass = nextClass.getSuperclass();
 			}
-		} else {
+		} else
 			recursiveAddInterfaceMethodsToList(type, methods);
-		}
 
 		int n = methods.size();
 		String[] methodNames = new String[n];
@@ -104,23 +109,20 @@ public abstract class MethodAccess {
 		String className = type.getName();
 		String accessClassName = className + "MethodAccess";
 		if (accessClassName.startsWith("java.")) accessClassName = "reflectasm." + accessClassName;
-		Class accessClass;
 
 		AccessClassLoader loader = AccessClassLoader.get(type);
-		try {
-			accessClass = loader.loadClass(accessClassName);
-		} catch (ClassNotFoundException ignored) {
+		Class accessClass = loader.loadAccessClass(accessClassName);
+		if (accessClass == null) {
 			synchronized (loader) {
-				try {
-					accessClass = loader.loadClass(accessClassName);
-				} catch (ClassNotFoundException ignored2) {
+				accessClass = loader.loadAccessClass(accessClassName);
+				if (accessClass == null) {
 					String accessClassNameInternal = accessClassName.replace('.', '/');
 					String classNameInternal = className.replace('.', '/');
-	
+
 					ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 					MethodVisitor mv;
-					cw.visit(V1_1, ACC_PUBLIC + ACC_SUPER, accessClassNameInternal, null, "com/esotericsoftware/reflectasm/MethodAccess",
-						null);
+					cw.visit(V1_1, ACC_PUBLIC + ACC_SUPER, accessClassNameInternal, null,
+						"com/esotericsoftware/reflectasm/MethodAccess", null);
 					{
 						mv = cw.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
 						mv.visitCode();
@@ -134,19 +136,19 @@ public abstract class MethodAccess {
 						mv = cw.visitMethod(ACC_PUBLIC + ACC_VARARGS, "invoke",
 							"(Ljava/lang/Object;I[Ljava/lang/Object;)Ljava/lang/Object;", null, null);
 						mv.visitCode();
-	
+
 						if (!methods.isEmpty()) {
 							mv.visitVarInsn(ALOAD, 1);
 							mv.visitTypeInsn(CHECKCAST, classNameInternal);
 							mv.visitVarInsn(ASTORE, 4);
-	
+
 							mv.visitVarInsn(ILOAD, 2);
 							Label[] labels = new Label[n];
 							for (int i = 0; i < n; i++)
 								labels[i] = new Label();
 							Label defaultLabel = new Label();
 							mv.visitTableSwitchInsn(0, labels.length - 1, defaultLabel, labels);
-	
+
 							StringBuilder buffer = new StringBuilder(128);
 							for (int i = 0; i < n; i++) {
 								mv.visitLabel(labels[i]);
@@ -155,10 +157,10 @@ public abstract class MethodAccess {
 								else
 									mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 								mv.visitVarInsn(ALOAD, 4);
-	
+
 								buffer.setLength(0);
 								buffer.append('(');
-	
+
 								Class[] paramTypes = parameterTypes[i];
 								Class returnType = returnTypes[i];
 								for (int paramIndex = 0; paramIndex < paramTypes.length; paramIndex++) {
@@ -208,7 +210,7 @@ public abstract class MethodAccess {
 									}
 									buffer.append(paramType.getDescriptor());
 								}
-	
+
 								buffer.append(')');
 								buffer.append(Type.getDescriptor(returnType));
 								int invoke;
@@ -219,7 +221,7 @@ public abstract class MethodAccess {
 								else
 									invoke = INVOKEVIRTUAL;
 								mv.visitMethodInsn(invoke, classNameInternal, methodNames[i], buffer.toString());
-	
+
 								switch (Type.getType(returnType).getSort()) {
 								case Type.VOID:
 									mv.visitInsn(ACONST_NULL);
@@ -249,10 +251,10 @@ public abstract class MethodAccess {
 									mv.visitMethodInsn(INVOKESTATIC, "java/lang/Double", "valueOf", "(D)Ljava/lang/Double;");
 									break;
 								}
-	
+
 								mv.visitInsn(ARETURN);
 							}
-	
+
 							mv.visitLabel(defaultLabel);
 							mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
 						}
@@ -272,7 +274,7 @@ public abstract class MethodAccess {
 					}
 					cw.visitEnd();
 					byte[] data = cw.toByteArray();
-					accessClass = loader.defineClass(accessClassName, data);
+					accessClass = loader.defineAccessClass(accessClassName, data);
 				}
 			}
 		}
@@ -287,7 +289,7 @@ public abstract class MethodAccess {
 		}
 	}
 
-	private static void addDeclaredMethodsToList (Class type, ArrayList<Method> methods) {
+	static private void addDeclaredMethodsToList (Class type, ArrayList<Method> methods) {
 		Method[] declaredMethods = type.getDeclaredMethods();
 		for (int i = 0, n = declaredMethods.length; i < n; i++) {
 			Method method = declaredMethods[i];
@@ -298,10 +300,9 @@ public abstract class MethodAccess {
 		}
 	}
 
-	private static void recursiveAddInterfaceMethodsToList (Class interfaceType, ArrayList<Method> methods) {
+	static private void recursiveAddInterfaceMethodsToList (Class interfaceType, ArrayList<Method> methods) {
 		addDeclaredMethodsToList(interfaceType, methods);
-		for (Class nextInterface : interfaceType.getInterfaces()) {
+		for (Class nextInterface : interfaceType.getInterfaces())
 			recursiveAddInterfaceMethodsToList(nextInterface, methods);
-		}
 	}
 }

@@ -91,6 +91,7 @@ public class MethodAccessTest extends TestCase {
 
 	public void testInvokeInterface () {
 		MethodAccess access = MethodAccess.get(ConcurrentMap.class);
+		access = MethodAccess.get(ConcurrentMap.class);
 		ConcurrentHashMap<String, String> someMap = new ConcurrentHashMap<String, String>();
 		someMap.put("first", "one");
 		someMap.put("second", "two");
