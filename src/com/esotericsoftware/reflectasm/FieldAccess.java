@@ -138,41 +138,39 @@ public abstract class FieldAccess {
 		String accessClassName = className + "FieldAccess";
 		if (accessClassName.startsWith("java.")) accessClassName = "reflectasm." + accessClassName;
 
+		Class accessClass;
 		AccessClassLoader loader = AccessClassLoader.get(type);
-		Class accessClass = loader.loadAccessClass(accessClassName);
-		if (accessClass == null) {
-			synchronized (loader) {
-				accessClass = loader.loadAccessClass(accessClassName);
-				if (accessClass == null) {
-					String accessClassNameInternal = accessClassName.replace('.', '/');
-					String classNameInternal = className.replace('.', '/');
+		synchronized (loader) {
+			accessClass = loader.loadAccessClass(accessClassName);
+			if (accessClass == null) {
+				String accessClassNameInternal = accessClassName.replace('.', '/');
+				String classNameInternal = className.replace('.', '/');
 
-					ClassWriter cw = new ClassWriter(0);
-					cw.visit(V1_1, ACC_PUBLIC + ACC_SUPER, accessClassNameInternal, null,
-						"com/esotericsoftware/reflectasm/FieldAccess", null);
-					insertConstructor(cw);
-					insertGetObject(cw, classNameInternal, fields);
-					insertSetObject(cw, classNameInternal, fields);
-					insertGetPrimitive(cw, classNameInternal, fields, Type.BOOLEAN_TYPE);
-					insertSetPrimitive(cw, classNameInternal, fields, Type.BOOLEAN_TYPE);
-					insertGetPrimitive(cw, classNameInternal, fields, Type.BYTE_TYPE);
-					insertSetPrimitive(cw, classNameInternal, fields, Type.BYTE_TYPE);
-					insertGetPrimitive(cw, classNameInternal, fields, Type.SHORT_TYPE);
-					insertSetPrimitive(cw, classNameInternal, fields, Type.SHORT_TYPE);
-					insertGetPrimitive(cw, classNameInternal, fields, Type.INT_TYPE);
-					insertSetPrimitive(cw, classNameInternal, fields, Type.INT_TYPE);
-					insertGetPrimitive(cw, classNameInternal, fields, Type.LONG_TYPE);
-					insertSetPrimitive(cw, classNameInternal, fields, Type.LONG_TYPE);
-					insertGetPrimitive(cw, classNameInternal, fields, Type.DOUBLE_TYPE);
-					insertSetPrimitive(cw, classNameInternal, fields, Type.DOUBLE_TYPE);
-					insertGetPrimitive(cw, classNameInternal, fields, Type.FLOAT_TYPE);
-					insertSetPrimitive(cw, classNameInternal, fields, Type.FLOAT_TYPE);
-					insertGetPrimitive(cw, classNameInternal, fields, Type.CHAR_TYPE);
-					insertSetPrimitive(cw, classNameInternal, fields, Type.CHAR_TYPE);
-					insertGetString(cw, classNameInternal, fields);
-					cw.visitEnd();
-					accessClass = loader.defineAccessClass(accessClassName, cw.toByteArray());
-				}
+				ClassWriter cw = new ClassWriter(0);
+				cw.visit(V1_1, ACC_PUBLIC + ACC_SUPER, accessClassNameInternal, null, "com/esotericsoftware/reflectasm/FieldAccess",
+					null);
+				insertConstructor(cw);
+				insertGetObject(cw, classNameInternal, fields);
+				insertSetObject(cw, classNameInternal, fields);
+				insertGetPrimitive(cw, classNameInternal, fields, Type.BOOLEAN_TYPE);
+				insertSetPrimitive(cw, classNameInternal, fields, Type.BOOLEAN_TYPE);
+				insertGetPrimitive(cw, classNameInternal, fields, Type.BYTE_TYPE);
+				insertSetPrimitive(cw, classNameInternal, fields, Type.BYTE_TYPE);
+				insertGetPrimitive(cw, classNameInternal, fields, Type.SHORT_TYPE);
+				insertSetPrimitive(cw, classNameInternal, fields, Type.SHORT_TYPE);
+				insertGetPrimitive(cw, classNameInternal, fields, Type.INT_TYPE);
+				insertSetPrimitive(cw, classNameInternal, fields, Type.INT_TYPE);
+				insertGetPrimitive(cw, classNameInternal, fields, Type.LONG_TYPE);
+				insertSetPrimitive(cw, classNameInternal, fields, Type.LONG_TYPE);
+				insertGetPrimitive(cw, classNameInternal, fields, Type.DOUBLE_TYPE);
+				insertSetPrimitive(cw, classNameInternal, fields, Type.DOUBLE_TYPE);
+				insertGetPrimitive(cw, classNameInternal, fields, Type.FLOAT_TYPE);
+				insertSetPrimitive(cw, classNameInternal, fields, Type.FLOAT_TYPE);
+				insertGetPrimitive(cw, classNameInternal, fields, Type.CHAR_TYPE);
+				insertSetPrimitive(cw, classNameInternal, fields, Type.CHAR_TYPE);
+				insertGetString(cw, classNameInternal, fields);
+				cw.visitEnd();
+				accessClass = loader.defineAccessClass(accessClassName, cw.toByteArray());
 			}
 		}
 		try {
