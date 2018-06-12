@@ -110,7 +110,7 @@
 							<relocations>
 								<relocation>
 									<pattern>org.objectweb.asm</pattern>
-									<shadedPattern>com.esotericsoftware.reflectasm.shaded.org.objectweb.asm</shadedPattern>
+									<shadedPattern>com.esotericsoftware.asm</shadedPattern>
 								</relocation>
 							</relocations>
 						</configuration>
