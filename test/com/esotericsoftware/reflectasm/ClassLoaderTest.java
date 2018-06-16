@@ -36,8 +36,9 @@ public class ClassLoaderTest extends TestCase {
 		assertEquals("first", testObject.toString());
 		assertEquals("first", access.get(testObject, "name"));
 	}
-	
+
 	public void testAutoUnloadClassloaders () throws Exception {
+		reclaimLoaders();
 		int initialCount = AccessClassLoader.activeAccessClassLoaders();
 
 		ClassLoader testClassLoader1 = new TestClassLoader1();
@@ -55,12 +56,12 @@ public class ClassLoaderTest extends TestCase {
 		access2.set(testObject2, "name", "second");
 		assertEquals("second", testObject2.toString());
 		assertEquals("second", access2.get(testObject2, "name"));
-		
+
 		assertEquals(access1.getClass().toString(), access2.getClass().toString()); // Same class names
 		assertFalse(access1.getClass().equals(access2.getClass())); // But different classes
-		
-		assertEquals(initialCount+2, AccessClassLoader.activeAccessClassLoaders());
-		
+
+		assertEquals(initialCount + 2, AccessClassLoader.activeAccessClassLoaders());
+
 		testClassLoader1 = null;
 		testClass1 = null;
 		testObject1 = null;
@@ -69,24 +70,28 @@ public class ClassLoaderTest extends TestCase {
 		testClass2 = null;
 		testObject2 = null;
 		access2 = null;
-		
+
+		reclaimLoaders();
+
+		// Yeah, reclaimed!
+		assertEquals(initialCount, AccessClassLoader.activeAccessClassLoaders());
+	}
+
+	private void reclaimLoaders () throws Exception {
 		// Force GC to reclaim unreachable (or only weak-reachable) objects
 		System.gc();
 		try {
-			Object[] array = new Object[(int) Runtime.getRuntime().maxMemory()];
+			Object[] array = new Object[(int)Runtime.getRuntime().maxMemory()];
 			System.out.println(array.length);
 		} catch (Throwable e) {
 			// Ignore OME
 		}
 		System.gc();
 		int times = 0;
-		while (AccessClassLoader.activeAccessClassLoaders()>1 && times < 50) { // max 5 seconds, should be instant
+		while (AccessClassLoader.activeAccessClassLoaders() > 1 && times < 50) { // max 5 seconds, should be instant
 			Thread.sleep(100); // test again
 			times++;
 		}
-
-		// Yeah, both reclaimed!
-		assertEquals(Math.min(initialCount, 1), AccessClassLoader.activeAccessClassLoaders());
 	}
 
 	public void testRemoveClassloaders () throws Exception {
@@ -107,18 +112,18 @@ public class ClassLoaderTest extends TestCase {
 		access2.set(testObject2, "name", "second");
 		assertEquals("second", testObject2.toString());
 		assertEquals("second", access2.get(testObject2, "name"));
-		
+
 		assertEquals(access1.getClass().toString(), access2.getClass().toString()); // Same class names
 		assertFalse(access1.getClass().equals(access2.getClass())); // But different classes
-		
-		assertEquals(initialCount+2, AccessClassLoader.activeAccessClassLoaders());
-		
+
+		assertEquals(initialCount + 2, AccessClassLoader.activeAccessClassLoaders());
+
 		AccessClassLoader.remove(testObject1.getClass().getClassLoader());
-		assertEquals(initialCount+1, AccessClassLoader.activeAccessClassLoaders());
+		assertEquals(initialCount + 1, AccessClassLoader.activeAccessClassLoaders());
 		AccessClassLoader.remove(testObject2.getClass().getClassLoader());
-		assertEquals(initialCount+0, AccessClassLoader.activeAccessClassLoaders());
+		assertEquals(initialCount + 0, AccessClassLoader.activeAccessClassLoaders());
 		AccessClassLoader.remove(this.getClass().getClassLoader());
-		assertEquals(initialCount-1, AccessClassLoader.activeAccessClassLoaders());
+		assertEquals(initialCount - 1, AccessClassLoader.activeAccessClassLoaders());
 	}
 
 	static public class Test {
@@ -128,7 +133,7 @@ public class ClassLoaderTest extends TestCase {
 			return name;
 		}
 	}
-	
+
 	static public class TestClassLoader1 extends ClassLoader {
 		protected synchronized Class<?> loadClass (String name, boolean resolve) throws ClassNotFoundException {
 			Class c = findLoadedClass(name);
