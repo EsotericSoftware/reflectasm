@@ -102,14 +102,15 @@ class AccessClassLoader extends ClassLoader {
 	}
 
 	static private Method getDefineClassMethod () throws Exception {
-		// DCL on volatile
 		if (defineClassMethod == null) {
 			synchronized (accessClassLoaders) {
-				defineClassMethod = ClassLoader.class.getDeclaredMethod("defineClass",
-					new Class[] {String.class, byte[].class, int.class, int.class, ProtectionDomain.class});
-				try {
-					defineClassMethod.setAccessible(true);
-				} catch (Exception ignored) {
+				if (defineClassMethod == null) {
+					defineClassMethod = ClassLoader.class.getDeclaredMethod("defineClass",
+						new Class[] {String.class, byte[].class, int.class, int.class, ProtectionDomain.class});
+					try {
+						defineClassMethod.setAccessible(true);
+					} catch (Exception ignored) {
+					}
 				}
 			}
 		}
