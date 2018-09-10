@@ -79,11 +79,11 @@ public abstract class MethodAccess {
 	}
 
 	/** Creates a new MethodAccess for the specified type.
-	 * @param type Must not be the Object class, a primitive type, or void. */
+	 * @param type Must not be a primitive type, or void. */
 	static public MethodAccess get (Class type) {
 		boolean isInterface = type.isInterface();
-		if (!isInterface && type.getSuperclass() == null)
-			throw new IllegalArgumentException("The type must not be the Object class, an interface, a primitive type, or void.");
+		if (!isInterface && type.getSuperclass() == null && type != Object.class)
+			throw new IllegalArgumentException("The type must not be an interface, a primitive type, or void.");
 
 		ArrayList<Method> methods = new ArrayList<Method>();
 		if (!isInterface) {
