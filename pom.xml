@@ -88,9 +88,11 @@
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>2.4</version>
 				<configuration>
-					<excludes>
-						<exclude>**/.svn/*</exclude>
-					</excludes>
+					<archive>
+						<manifestEntries>
+							<Automatic-Module-Name>com.esotericsoftware.reflectasm</Automatic-Module-Name>
+						</manifestEntries>
+					</archive>
 				</configuration>
 			</plugin>
 			<plugin>
