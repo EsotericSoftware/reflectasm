@@ -127,6 +127,7 @@
 				<configuration>
 					<instructions>
 						<Export-Package>com.esotericsoftware.reflectasm*</Export-Package>
+						<Import-Package>!org.objectweb.asm.*</Import-Package>
 					</instructions>
 				</configuration>
 			</plugin>
