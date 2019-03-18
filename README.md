@@ -27,7 +27,7 @@ To use reflectasm with maven, please use the following snippet in your pom.xml
     <dependency>
         <groupId>com.esotericsoftware</groupId>
         <artifactId>reflectasm</artifactId>
-        <version>1.11.7</version>
+        <version>1.11.9</version>
     </dependency>
 ```
 
