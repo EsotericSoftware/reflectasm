@@ -147,7 +147,7 @@ public abstract class FieldAccess {
 				String classNameInternal = className.replace('.', '/');
 
 				ClassWriter cw = new ClassWriter(0);
-				cw.visit(V1_6, ACC_PUBLIC + ACC_SUPER, accessClassNameInternal, null, "com/esotericsoftware/reflectasm/FieldAccess",
+				cw.visit(V1_6, ACC_PUBLIC + ACC_SUPER + ACC_SYNTHETIC, accessClassNameInternal, null, "com/esotericsoftware/reflectasm/FieldAccess",
 					null);
 				insertConstructor(cw);
 				insertGetObject(cw, classNameInternal, fields);
