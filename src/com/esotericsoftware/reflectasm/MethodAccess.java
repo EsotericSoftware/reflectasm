@@ -90,6 +90,9 @@ public abstract class MethodAccess {
 			Class nextClass = type;
 			while (nextClass != Object.class) {
 				addDeclaredMethodsToList(nextClass, methods);
+				for (Class nextInterface : nextClass.getInterfaces()) {
+					addDeclaredMethodsToList(nextInterface, methods);
+				}
 				nextClass = nextClass.getSuperclass();
 			}
 		} else
