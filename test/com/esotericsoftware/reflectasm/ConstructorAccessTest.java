@@ -14,11 +14,21 @@
 
 package com.esotericsoftware.reflectasm;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import java.util.List;
+
 import junit.framework.TestCase;
 
 public class ConstructorAccessTest extends TestCase {
+	static private boolean java17;
+	static {
+		try {
+			Object version = Runtime.class.getDeclaredMethod("version").invoke(null);
+			java17 = ((List<Integer>)version.getClass().getDeclaredMethod("version").invoke(version)).get(0) >= 17;
+		} catch (Exception ignored) {
+			java17 = false;
+		}
+	}
+
 	public void testNewInstance () {
 		ConstructorAccess<SomeClass> access = ConstructorAccess.get(SomeClass.class);
 		SomeClass someObject = new SomeClass();
@@ -28,6 +38,7 @@ public class ConstructorAccessTest extends TestCase {
 	}
 
 	public void testPackagePrivateNewInstance () {
+		if (java17) return;
 		ConstructorAccess<PackagePrivateClass> access = ConstructorAccess.get(PackagePrivateClass.class);
 		PackagePrivateClass someObject = new PackagePrivateClass();
 		assertEquals(someObject, access.newInstance());
@@ -39,12 +50,10 @@ public class ConstructorAccessTest extends TestCase {
 		try {
 			ConstructorAccess.get(HasArgumentConstructor.class);
 			assertTrue(false);
-		}
-		catch (RuntimeException re) {
+		} catch (RuntimeException re) {
 			System.out.println("Expected exception happened: " + re);
-		}
-		catch (Throwable t) {
-			System.out.println("Unexpected exception happened: " + t);
+		} catch (Throwable t) {
+			t.printStackTrace();
 			assertTrue(false);
 		}
 	}
@@ -53,36 +62,34 @@ public class ConstructorAccessTest extends TestCase {
 		try {
 			ConstructorAccess.get(HasPrivateConstructor.class);
 			assertTrue(false);
-		}
-		catch (RuntimeException re) {
+		} catch (RuntimeException re) {
 			System.out.println("Expected exception happened: " + re);
-		}
-		catch (Throwable t) {
-			System.out.println("Unexpected exception happened: " + t);
+		} catch (Throwable t) {
+			t.printStackTrace();
 			assertTrue(false);
 		}
 	}
 
 	public void testHasProtectedConstructor () {
+		if (java17) return;
 		try {
 			ConstructorAccess<HasProtectedConstructor> access = ConstructorAccess.get(HasProtectedConstructor.class);
 			HasProtectedConstructor newInstance = access.newInstance();
 			assertEquals("cow", newInstance.getMoo());
-		}
-		catch (Throwable t) {
-			System.out.println("Unexpected exception happened: " + t);
+		} catch (Throwable t) {
+			t.printStackTrace();
 			assertTrue(false);
 		}
 	}
 
-	public void testHasPackageProtectedConstructor () {
+	public void testHasPackagePrivateConstructor () {
+		if (java17) return;
 		try {
-			ConstructorAccess<HasPackageProtectedConstructor> access = ConstructorAccess.get(HasPackageProtectedConstructor.class);
-			HasPackageProtectedConstructor newInstance = access.newInstance();
+			ConstructorAccess<HasPackagePrivateConstructor> access = ConstructorAccess.get(HasPackagePrivateConstructor.class);
+			HasPackagePrivateConstructor newInstance = access.newInstance();
 			assertEquals("cow", newInstance.getMoo());
-		}
-		catch (Throwable t) {
-			System.out.println("Unexpected exception happened: " + t);
+		} catch (Throwable t) {
+			t.printStackTrace();
 			assertTrue(false);
 		}
 	}
@@ -92,9 +99,8 @@ public class ConstructorAccessTest extends TestCase {
 			ConstructorAccess<HasPublicConstructor> access = ConstructorAccess.get(HasPublicConstructor.class);
 			HasPublicConstructor newInstance = access.newInstance();
 			assertEquals("cow", newInstance.getMoo());
-		}
-		catch (Throwable t) {
-			System.out.println("Unexpected exception happened: " + t);
+		} catch (Throwable t) {
+			t.printStackTrace();
 			assertTrue(false);
 		}
 	}
@@ -152,7 +158,7 @@ public class ConstructorAccessTest extends TestCase {
 			return true;
 		}
 	}
-	
+
 	static public class HasArgumentConstructor {
 		public String moo;
 
@@ -170,8 +176,8 @@ public class ConstructorAccessTest extends TestCase {
 			} else if (!moo.equals(other.moo)) return false;
 			return true;
 		}
-		
-		public String getMoo() {
+
+		public String getMoo () {
 			return moo;
 		}
 	}
@@ -189,14 +195,14 @@ public class ConstructorAccessTest extends TestCase {
 		}
 	}
 
-	static public class HasPackageProtectedConstructor extends HasProtectedConstructor {
-		HasPackageProtectedConstructor () {
+	static public class HasPackagePrivateConstructor extends HasProtectedConstructor {
+		HasPackagePrivateConstructor () {
 			super();
 		}
 	}
 
-	static public class HasPublicConstructor extends HasPackageProtectedConstructor {
-		HasPublicConstructor () {
+	static public class HasPublicConstructor extends HasPackagePrivateConstructor {
+		public HasPublicConstructor () {
 			super();
 		}
 	}
