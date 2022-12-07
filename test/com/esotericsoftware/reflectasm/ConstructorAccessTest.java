@@ -30,11 +30,15 @@ public class ConstructorAccessTest extends TestCase {
 	}
 
 	public void testNewInstance () {
-		ConstructorAccess<SomeClass> access = ConstructorAccess.get(SomeClass.class);
+		ConstructorAccess<SomeClass> access = ConstructorAccess.get(SomeClass.class, String.class, int.class, float.class, Float.class, String.class);
 		SomeClass someObject = new SomeClass();
+		SomeClass someObject0 = new SomeClass("11", 12, 13f, 14f, "15");
 		assertEquals(someObject, access.newInstance());
 		assertEquals(someObject, access.newInstance());
 		assertEquals(someObject, access.newInstance());
+		assertEquals(someObject0, access.newInstance0("11", 12, 13f, 14f, "15"));
+		assertEquals(someObject0, access.newInstance0("11", 12, 13f, 14f, "15"));
+		assertEquals(someObject0, access.newInstance0("11", 12, 13f, 14f, "15"));
 	}
 
 	public void testPackagePrivateNewInstance () {
@@ -138,6 +142,17 @@ public class ConstructorAccessTest extends TestCase {
 		protected float test1;
 		Float test2;
 		private String test3;
+
+		public SomeClass() {
+		}
+
+		public SomeClass(String name, int intValue, float test1, Float test2, String test3) {
+			this.name = name;
+			this.intValue = intValue;
+			this.test1 = test1;
+			this.test2 = test2;
+			this.test3 = test3;
+		}
 
 		public boolean equals (Object obj) {
 			if (this == obj) return true;
