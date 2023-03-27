@@ -16,6 +16,7 @@ package com.esotericsoftware.reflectasm;
 
 import static org.objectweb.asm.Opcodes.*;
 
+import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -78,9 +79,13 @@ public abstract class MethodAccess {
 		return returnTypes;
 	}
 
+	static public MethodAccess get (Class type) {
+		return get(type, null);
+	}
+
 	/** Creates a new MethodAccess for the specified type.
 	 * @param type Must not be a primitive type, or void. */
-	static public MethodAccess get (Class type) {
+	static public MethodAccess get (Class type, Lookup lookup) {
 		boolean isInterface = type.isInterface();
 		if (!isInterface && type.getSuperclass() == null && type != Object.class)
 			throw new IllegalArgumentException("The type must not be an interface, a primitive type, or void.");
@@ -273,7 +278,7 @@ public abstract class MethodAccess {
 				}
 				cw.visitEnd();
 				byte[] data = cw.toByteArray();
-				accessClass = loader.defineAccessClass(accessClassName, data);
+				accessClass = loader.defineAccessClass(accessClassName, data, lookup);
 			}
 		}
 		try {

@@ -16,6 +16,7 @@ package com.esotericsoftware.reflectasm;
 
 import static org.objectweb.asm.Opcodes.*;
 
+import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 
@@ -42,6 +43,10 @@ abstract public class ConstructorAccess<T> {
 	abstract public T newInstance (Object enclosingInstance);
 
 	static public <T> ConstructorAccess<T> get (Class<T> type) {
+		return get(type, null);
+	}
+
+	static public <T> ConstructorAccess<T> get (Class<T> type, Lookup lookup) {
 		Class enclosingType = type.getEnclosingClass();
 		boolean isNonStaticMemberClass = enclosingType != null && type.isMemberClass() && !Modifier.isStatic(type.getModifiers());
 
@@ -96,7 +101,7 @@ abstract public class ConstructorAccess<T> {
 				insertNewInstanceInner(cw, classNameInternal, enclosingClassNameInternal);
 
 				cw.visitEnd();
-				accessClass = loader.defineAccessClass(accessClassName, cw.toByteArray());
+				accessClass = loader.defineAccessClass(accessClassName, cw.toByteArray(), lookup);
 			}
 		}
 		ConstructorAccess<T> access;
