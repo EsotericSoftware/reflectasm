@@ -14,6 +14,7 @@
 
 package com.esotericsoftware.reflectasm;
 
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -38,8 +39,12 @@ public class ConstructorAccessTest extends TestCase {
 	}
 
 	public void testPackagePrivateNewInstance () {
-		if (java17) return;
-		ConstructorAccess<PackagePrivateClass> access = ConstructorAccess.get(PackagePrivateClass.class);
+		ConstructorAccess<PackagePrivateClass> access;
+		if (java17) {
+			access = ConstructorAccess.get(PackagePrivateClass.class, MethodHandles.lookup());
+		} else {
+			access = ConstructorAccess.get(PackagePrivateClass.class);
+		}
 		PackagePrivateClass someObject = new PackagePrivateClass();
 		assertEquals(someObject, access.newInstance());
 		assertEquals(someObject, access.newInstance());
@@ -71,9 +76,13 @@ public class ConstructorAccessTest extends TestCase {
 	}
 
 	public void testHasProtectedConstructor () {
-		if (java17) return;
 		try {
-			ConstructorAccess<HasProtectedConstructor> access = ConstructorAccess.get(HasProtectedConstructor.class);
+			ConstructorAccess<HasProtectedConstructor> access;
+			if (java17) {
+				access = ConstructorAccess.get(HasProtectedConstructor.class, MethodHandles.lookup());
+			} else {
+				access = ConstructorAccess.get(HasProtectedConstructor.class);
+			}
 			HasProtectedConstructor newInstance = access.newInstance();
 			assertEquals("cow", newInstance.getMoo());
 		} catch (Throwable t) {
@@ -83,9 +92,13 @@ public class ConstructorAccessTest extends TestCase {
 	}
 
 	public void testHasPackagePrivateConstructor () {
-		if (java17) return;
 		try {
-			ConstructorAccess<HasPackagePrivateConstructor> access = ConstructorAccess.get(HasPackagePrivateConstructor.class);
+			ConstructorAccess<HasPackagePrivateConstructor> access;
+			if (java17) {
+				access = ConstructorAccess.get(HasPackagePrivateConstructor.class, MethodHandles.lookup());
+			} else {
+				access = ConstructorAccess.get(HasPackagePrivateConstructor.class);
+			}
 			HasPackagePrivateConstructor newInstance = access.newInstance();
 			assertEquals("cow", newInstance.getMoo());
 		} catch (Throwable t) {

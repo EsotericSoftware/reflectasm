@@ -16,6 +16,7 @@ package com.esotericsoftware.reflectasm;
 
 import static org.objectweb.asm.Opcodes.*;
 
+import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -108,8 +109,12 @@ public abstract class FieldAccess {
 
 	abstract public float getFloat (Object instance, int fieldIndex);
 
-	/** @param type Must not be the Object class, an interface, a primitive type, or void. */
 	static public FieldAccess get (Class type) {
+		return get(type, (Lookup) null);
+	}
+
+	/** @param type Must not be the Object class, an interface, a primitive type, or void. */
+	static public FieldAccess get (Class type, Lookup lookup) {
 		if (type.getSuperclass() == null)
 			throw new IllegalArgumentException("The type must not be the Object class, an interface, a primitive type, or void.");
 
@@ -170,7 +175,7 @@ public abstract class FieldAccess {
 				insertSetPrimitive(cw, classNameInternal, fields, Type.CHAR_TYPE);
 				insertGetString(cw, classNameInternal, fields);
 				cw.visitEnd();
-				accessClass = loader.defineAccessClass(accessClassName, cw.toByteArray());
+				accessClass = loader.defineAccessClass(accessClassName, cw.toByteArray(), lookup);
 			}
 		}
 		try {
