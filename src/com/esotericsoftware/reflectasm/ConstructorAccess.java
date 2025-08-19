@@ -21,6 +21,7 @@ import java.lang.reflect.Modifier;
 
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Type;
 
 abstract public class ConstructorAccess<T> {
 	boolean isNonStaticMemberClass;
@@ -36,12 +37,30 @@ abstract public class ConstructorAccess<T> {
 	 * fron the enclosing instance. */
 	abstract public T newInstance ();
 
+	abstract public T newInstance0 (Object... args);
+
+	public T newInstance0 () {
+		return newInstance();
+	}
+
 	/** Constructor for inner classes (non-static nested classes).
 	 * @param enclosingInstance The instance of the enclosing type to which this inner instance is related to (assigned to its
 	 *           synthetic this$0 field). */
 	abstract public T newInstance (Object enclosingInstance);
 
 	static public <T> ConstructorAccess<T> get (Class<T> type) {
+		return get(type, (Class<?>[])null);
+	}
+
+	static public <T> ConstructorAccess<T> get (Class<T> type, Constructor<?> constructor) {
+		Class<?>[] parameterTypes = null;
+		if (constructor != null) {
+			parameterTypes = constructor.getParameterTypes();
+		}
+		return get(type, parameterTypes);
+	}
+
+	static public <T> ConstructorAccess<T> get (Class<T> type, Class<?>... args) {
 		Class enclosingType = type.getEnclosingClass();
 		boolean isNonStaticMemberClass = enclosingType != null && type.isMemberClass() && !Modifier.isStatic(type.getModifiers());
 
@@ -88,11 +107,14 @@ abstract public class ConstructorAccess<T> {
 					? "com/esotericsoftware/reflectasm/PublicConstructorAccess"
 					: "com/esotericsoftware/reflectasm/ConstructorAccess";
 
-				ClassWriter cw = new ClassWriter(0);
+				ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 				cw.visit(V1_6, ACC_PUBLIC + ACC_SUPER, accessClassNameInternal, null, superclassNameInternal, null);
 
 				insertConstructor(cw, superclassNameInternal);
 				insertNewInstance(cw, classNameInternal);
+				if (args != null) {
+					insertNewInstance0(cw, classNameInternal, args);
+				}
 				insertNewInstanceInner(cw, classNameInternal, enclosingClassNameInternal);
 
 				cw.visitEnd();
@@ -135,6 +157,71 @@ abstract public class ConstructorAccess<T> {
 		mv.visitMethodInsn(INVOKESPECIAL, classNameInternal, "<init>", "()V");
 		mv.visitInsn(ARETURN);
 		mv.visitMaxs(2, 1);
+		mv.visitEnd();
+	}
+
+	static void insertNewInstance0 (ClassWriter cw, String classNameInternal, Class<?>[] args) {
+		MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "newInstance0", "([Ljava/lang/Object;)Ljava/lang/Object;", null, null);
+		mv.visitCode();
+		mv.visitTypeInsn(NEW, classNameInternal);
+		mv.visitInsn(DUP);
+
+		StringBuilder buffer = new StringBuilder(128);
+		buffer.setLength(0);
+		buffer.append('(');
+		if (args == null)
+			args = new Class[0];
+		for (int i = 0; i < args.length; i++) {
+			mv.visitVarInsn(ALOAD, 1);
+			mv.visitIntInsn(BIPUSH, i);
+			mv.visitInsn(AALOAD);
+			Type paramType = Type.getType(args[i]);
+			switch (paramType.getSort()) {
+				case org.objectweb.asm.Type.BOOLEAN:
+					mv.visitTypeInsn(CHECKCAST, "java/lang/Boolean");
+					mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Boolean", "booleanValue", "()Z");
+					break;
+				case org.objectweb.asm.Type.BYTE:
+					mv.visitTypeInsn(CHECKCAST, "java/lang/Byte");
+					mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Byte", "byteValue", "()B");
+					break;
+				case org.objectweb.asm.Type.CHAR:
+					mv.visitTypeInsn(CHECKCAST, "java/lang/Character");
+					mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Character", "charValue", "()C");
+					break;
+				case org.objectweb.asm.Type.SHORT:
+					mv.visitTypeInsn(CHECKCAST, "java/lang/Short");
+					mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Short", "shortValue", "()S");
+					break;
+				case org.objectweb.asm.Type.INT:
+					mv.visitTypeInsn(CHECKCAST, "java/lang/Integer");
+					mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Integer", "intValue", "()I");
+					break;
+				case org.objectweb.asm.Type.FLOAT:
+					mv.visitTypeInsn(CHECKCAST, "java/lang/Float");
+					mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Float", "floatValue", "()F");
+					break;
+				case org.objectweb.asm.Type.LONG:
+					mv.visitTypeInsn(CHECKCAST, "java/lang/Long");
+					mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Long", "longValue", "()J");
+					break;
+				case org.objectweb.asm.Type.DOUBLE:
+					mv.visitTypeInsn(CHECKCAST, "java/lang/Double");
+					mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Double", "doubleValue", "()D");
+					break;
+				case org.objectweb.asm.Type.ARRAY:
+					mv.visitTypeInsn(CHECKCAST, paramType.getDescriptor());
+					break;
+				case org.objectweb.asm.Type.OBJECT:
+					mv.visitTypeInsn(CHECKCAST, paramType.getInternalName());
+					break;
+			}
+			buffer.append(paramType.getDescriptor());
+		}
+		buffer.append(")V");
+		mv.visitMethodInsn(INVOKESPECIAL, classNameInternal, "<init>", buffer.toString());
+		mv.visitInsn(ARETURN);
+		mv.visitMaxs(0, 0);
 		mv.visitEnd();
 	}
 
