@@ -95,12 +95,14 @@ public abstract class MethodAccess {
 		} else
 			recursiveAddInterfaceMethodsToList(type, methods);
 
+		boolean hasStaticInterfaceMethod = false;
 		int n = methods.size();
 		String[] methodNames = new String[n];
 		Class[][] parameterTypes = new Class[n][];
 		Class[] returnTypes = new Class[n];
 		for (int i = 0; i < n; i++) {
 			Method method = methods.get(i);
+			if (isInterface && Modifier.isStatic(method.getModifiers())) hasStaticInterfaceMethod = true;
 			methodNames[i] = method.getName();
 			parameterTypes[i] = method.getParameterTypes();
 			returnTypes[i] = method.getReturnType();
@@ -120,8 +122,8 @@ public abstract class MethodAccess {
 
 				ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 				MethodVisitor mv;
-				cw.visit(V1_6, ACC_PUBLIC + ACC_SUPER, accessClassNameInternal, null, "com/esotericsoftware/reflectasm/MethodAccess",
-					null);
+				cw.visit(hasStaticInterfaceMethod ? V1_8 : V1_6, ACC_PUBLIC + ACC_SUPER, accessClassNameInternal, null,
+					"com/esotericsoftware/reflectasm/MethodAccess", null);
 				{
 					mv = cw.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
 					mv.visitCode();
@@ -213,13 +215,15 @@ public abstract class MethodAccess {
 							buffer.append(')');
 							buffer.append(Type.getDescriptor(returnType));
 							int invoke;
-							if (isInterface)
-								invoke = INVOKEINTERFACE;
-							else if (Modifier.isStatic(methods.get(i).getModifiers()))
+							if (Modifier.isStatic(methods.get(i).getModifiers()))
 								invoke = INVOKESTATIC;
+							else if (isInterface)
+								invoke = INVOKEINTERFACE;
 							else
 								invoke = INVOKEVIRTUAL;
-							mv.visitMethodInsn(invoke, classNameInternal, methodNames[i], buffer.toString());
+							String owner = isInterface && invoke == INVOKESTATIC
+								? Type.getInternalName(methods.get(i).getDeclaringClass()) : classNameInternal;
+							mv.visitMethodInsn(invoke, owner, methodNames[i], buffer.toString(), isInterface);
 
 							switch (Type.getType(returnType).getSort()) {
 							case Type.VOID:
