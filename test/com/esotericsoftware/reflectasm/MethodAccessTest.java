@@ -76,7 +76,7 @@ public class MethodAccessTest extends TestCase {
 		} catch (NoSuchMethodException ignored) {
 			return;
 		}
-		MethodAccess access = MethodAccess.get(ConcurrentMap.class);
+		MethodAccess access = MethodAccess.get(java.util.concurrent.ConcurrentMap.class);
 		assertEquals(java.util.Collections.emptyMap(), access.invoke(null, "of"));
 	}
 
