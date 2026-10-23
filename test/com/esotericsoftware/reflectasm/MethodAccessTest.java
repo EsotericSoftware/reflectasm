@@ -55,6 +55,31 @@ public class MethodAccessTest extends TestCase {
 		assertEquals("meow! moo, 1234", value);
 	}
 
+	public void testStaticInterfaceMethod () {
+		// Comparator has static methods starting with Java 8.
+		try {
+			java.util.Comparator.class.getMethod("naturalOrder");
+		} catch (NoSuchMethodException ignored) {
+			return;
+		}
+		MethodAccess access = MethodAccess.get(java.util.Comparator.class);
+		java.util.Comparator comparator = (java.util.Comparator)access.invoke(null, "naturalOrder");
+		assertTrue(comparator.compare("a", "b") < 0);
+		comparator = (java.util.Comparator)access.invoke(null, "reverseOrder");
+		assertTrue(comparator.compare("a", "b") > 0);
+	}
+
+	public void testStaticSuperinterfaceMethod () {
+		// ConcurrentMap's collected methods include Map.of starting with Java 9.
+		try {
+			java.util.Map.class.getMethod("of");
+		} catch (NoSuchMethodException ignored) {
+			return;
+		}
+		MethodAccess access = MethodAccess.get(java.util.concurrent.ConcurrentMap.class);
+		assertEquals(java.util.Collections.emptyMap(), access.invoke(null, "of"));
+	}
+
 	public void testEmptyClass () {
 		MethodAccess access = MethodAccess.get(EmptyClass.class);
 		try {
